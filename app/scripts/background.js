@@ -1,11 +1,9 @@
 /**
- * @file The entry point for the web extension singleton process.
+ * @file 浏览器扩展单例进程的入口点。 [注：作为后台服务的主入口，管理扩展核心逻辑]
  */
 
-// Disabled to allow setting up initial state hooks first
-
-// This import sets up global functions required for Sentry to function.
-// It must be run first in case an error is thrown later during initialization.
+// 禁用以便首先设置初始状态钩子 [注：确保Sentry等核心功能初始化前置]
+// 此导入设置Sentry所需的全局函数。 [注：必须首先执行以捕获后续初始化错误]
 import './lib/setup-initial-state-hooks';
 
 import EventEmitter from 'events';
@@ -25,161 +23,155 @@ import {
   EXTENSION_MESSAGES,
   PLATFORM_FIREFOX,
   MESSAGE_TYPE,
-} from '../../shared/constants/app';
+} from '../../shared/constants/app'; // 导入应用环境相关常量 [注：用于区分扩展不同运行环境]
 import {
   REJECT_NOTIFICATION_CLOSE,
   REJECT_NOTIFICATION_CLOSE_SIG,
   MetaMetricsEventCategory,
   MetaMetricsEventName,
   MetaMetricsUserTrait,
-} from '../../shared/constants/metametrics';
-import { checkForLastErrorAndLog } from '../../shared/modules/browser-runtime.utils';
-import { isManifestV3 } from '../../shared/modules/mv3.utils';
-import { maskObject } from '../../shared/modules/object.utils';
-import { FIXTURE_STATE_METADATA_VERSION } from '../../test/e2e/default-fixture';
-import { getSocketBackgroundToMocha } from '../../test/e2e/background-socket/socket-background-to-mocha';
+} from '../../shared/constants/metametrics'; // 导入元数据事件常量 [注：用于用户行为统计]
+import { checkForLastErrorAndLog } from '../../shared/modules/browser-runtime.utils'; // 错误处理工具 [注：统一日志记录和错误捕获]
+import { isManifestV3 } from '../../shared/modules/mv3.utils'; // 检测浏览器清单版本 [注：区分MV2/MV3不同逻辑]
+import { maskObject } from '../../shared/modules/object.utils'; // 对象掩码工具 [注：敏感数据处理]
+import { FIXTURE_STATE_METADATA_VERSION } from '../../test/e2e/default-fixture'; // 测试夹具版本号 [注：用于初始化测试状态]
+import { getSocketBackgroundToMocha } from '../../test/e2e/background-socket/socket-background-to-mocha'; // 测试用Socket连接 [注：Mocha测试框架通信]
 import {
   OffscreenCommunicationTarget,
   OffscreenCommunicationEvents,
-} from '../../shared/constants/offscreen-communication';
+} from '../../shared/constants/offscreen-communication'; // 离线通信常量 [注：MV3离线文档通信]
 import {
   FakeLedgerBridge,
   FakeTrezorBridge,
-} from '../../test/stub/keyring-bridge';
-import { getCurrentChainId } from '../../shared/modules/selectors/networks';
-import getFetchWithTimeout from '../../shared/modules/fetch-with-timeout';
-import { PersistenceManager } from './lib/stores/persistence-manager';
-import ExtensionStore from './lib/stores/extension-store';
-import ReadOnlyNetworkStore from './lib/stores/read-only-network-store';
-import migrations from './migrations';
-import Migrator from './lib/migrator';
-import ExtensionPlatform from './platforms/extension';
-import { SENTRY_BACKGROUND_STATE } from './constants/sentry-state';
+} from '../../test/stub/keyring-bridge'; // 硬件钱包模拟桥接 [注：测试环境替代真实设备]
+import { getCurrentChainId } from '../../shared/modules/selectors/networks'; // 获取当前链ID [注：多链环境核心选择器]
+import getFetchWithTimeout from '../../shared/modules/fetch-with-timeout'; // 带超时的Fetch工具 [注：网络请求异常处理]
+import { PersistenceManager } from './lib/stores/persistence-manager'; // 持久化管理器 [注：状态存储核心类]
+import ExtensionStore from './lib/stores/extension-store'; // 扩展存储 [注：生产环境状态存储]
+import ReadOnlyNetworkStore from './lib/stores/read-only-network-store'; // 只读网络存储 [注：测试环境静态数据]
+import migrations from './migrations'; // 数据迁移脚本 [注：版本升级时状态迁移]
+import Migrator from './lib/migrator'; // 迁移器 [注：管理状态迁移流程]
+import ExtensionPlatform from './platforms/extension'; // 扩展平台抽象 [注：浏览器API封装]
+import { SENTRY_BACKGROUND_STATE } from './constants/sentry-state'; // Sentry状态配置 [注：监控后台状态字段]
 
-import createStreamSink from './lib/createStreamSink';
+import createStreamSink from './lib/createStreamSink'; // 创建流接收器 [注：状态持久化流处理]
 import NotificationManager, {
   NOTIFICATION_MANAGER_EVENTS,
-} from './lib/notification-manager';
+} from './lib/notification-manager'; // 通知管理器 [注：处理弹出通知逻辑]
 import MetamaskController, {
   METAMASK_CONTROLLER_EVENTS,
-} from './metamask-controller';
-import getFirstPreferredLangCode from './lib/get-first-preferred-lang-code';
-import getObjStructure from './lib/getObjStructure';
-import setupEnsIpfsResolver from './lib/ens-ipfs/setup';
+} from './metamask-controller'; // MetaMask核心控制器 [注：协调各模块交互]
+import getFirstPreferredLangCode from './lib/get-first-preferred-lang-code'; // 获取首选语言 [注：国际化支持]
+import getObjStructure from './lib/getObjStructure'; // 获取对象结构 [注：敏感数据脱敏处理]
+import setupEnsIpfsResolver from './lib/ens-ipfs/setup'; // 配置ENS/IPFS解析器 [注：域名解析功能]
 import {
   deferredPromise,
   getPlatform,
   shouldEmitDappViewedEvent,
-} from './lib/util';
-import { createOffscreen } from './offscreen';
-import { generateWalletState } from './fixtures/generate-wallet-state';
-import rawFirstTimeState from './first-time-state';
+} from './lib/util'; // 工具函数集 [注：包含延迟Promise、平台检测等]
+import { createOffscreen } from './offscreen'; // 创建离线文档 [注：MV3离线功能支持]
+import { generateWalletState } from './fixtures/generate-wallet-state'; // 生成钱包状态 [注：测试数据生成]
+import rawFirstTimeState from './first-time-state'; // 初始状态模板 [注：新安装时默认配置]
 
 /* eslint-enable import/first */
 
-import { COOKIE_ID_MARKETING_WHITELIST_ORIGINS } from './constants/marketing-site-whitelist';
-import { PREINSTALLED_SNAPS_URLS } from './constants/snaps';
+import { COOKIE_ID_MARKETING_WHITELIST_ORIGINS } from './constants/marketing-site-whitelist'; // 营销域名白名单 [注：Cookie策略豁免列表]
+import { PREINSTALLED_SNAPS_URLS } from './constants/snaps'; // 预装Snaps地址 [注：初始化加载第三方扩展]
 
 // eslint-disable-next-line @metamask/design-tokens/color-no-hex
-const BADGE_COLOR_APPROVAL = '#0376C9';
+const BADGE_COLOR_APPROVAL = '#0376C9'; // 审批徽章颜色 [注：蓝色表示待审批事项]
 // eslint-disable-next-line @metamask/design-tokens/color-no-hex
-const BADGE_COLOR_NOTIFICATION = '#D73847';
-const BADGE_MAX_COUNT = 9;
+const BADGE_COLOR_NOTIFICATION = '#D73847'; // 通知徽章颜色 [注：红色表示未读通知]
+const BADGE_MAX_COUNT = 9; // 徽章最大显示数 [注：超过显示为9+]
 
-// Setup global hook for improved Sentry state snapshots during initialization
+// 设置全局钩子以优化初始化期间的Sentry状态快照 [注：错误监控增强]
 const inTest = process.env.IN_TEST;
 const migrator = new Migrator({
   migrations,
   defaultVersion: process.env.WITH_STATE
     ? FIXTURE_STATE_METADATA_VERSION
     : null,
-});
+}); // 初始化数据迁移器 [注：根据环境选择默认版本]
 
-const localStore = inTest ? new ReadOnlyNetworkStore() : new ExtensionStore();
-const persistenceManager = new PersistenceManager({ localStore });
+const localStore = inTest ? new ReadOnlyNetworkStore() : new ExtensionStore(); // 初始化本地存储 [注：测试环境使用只读存储]
+const persistenceManager = new PersistenceManager({ localStore }); // 初始化持久化管理器 [注：管理状态存储与读取]
 global.stateHooks.getMostRecentPersistedState = () =>
-  persistenceManager.mostRecentRetrievedState;
+  persistenceManager.mostRecentRetrievedState; // 暴露全局状态钩子 [注：供Sentry获取最新持久化状态]
 
 const { sentry } = global;
-let firstTimeState = { ...rawFirstTimeState };
+let firstTimeState = { ...rawFirstTimeState }; // 初始化首次状态 [注：合并默认模板]
 
 const metamaskInternalProcessHash = {
   [ENVIRONMENT_TYPE_POPUP]: true,
   [ENVIRONMENT_TYPE_NOTIFICATION]: true,
   [ENVIRONMENT_TYPE_FULLSCREEN]: true,
-};
+}; // 内部进程标识 [注：区分可信的扩展内环境]
 
-const metamaskBlockedPorts = ['trezor-connect'];
+const metamaskBlockedPorts = ['trezor-connect']; // 阻塞端口列表 [注：禁止特定设备连接]
 
-log.setLevel(process.env.METAMASK_DEBUG ? 'debug' : 'info', false);
+log.setLevel(process.env.METAMASK_DEBUG ? 'debug' : 'info', false); // 配置日志级别 [注：调试模式启用详细日志]
 
-const platform = new ExtensionPlatform();
-const notificationManager = new NotificationManager();
-const isFirefox = getPlatform() === PLATFORM_FIREFOX;
+const platform = new ExtensionPlatform(); // 初始化平台实例 [注：封装浏览器差异API]
+const notificationManager = new NotificationManager(); // 初始化通知管理器 [注：控制弹出窗口逻辑]
+const isFirefox = getPlatform() === PLATFORM_FIREFOX; // 检测Firefox平台 [注：处理浏览器特定逻辑]
 
-let openPopupCount = 0;
-let notificationIsOpen = false;
-let uiIsTriggering = false;
-const openMetamaskTabsIDs = {};
-const requestAccountTabIds = {};
-let controller;
-const tabOriginMapping = {};
+let openPopupCount = 0; // 弹出窗口计数 [注：跟踪当前打开的Popup数量]
+let notificationIsOpen = false; // 通知窗口状态 [注：标记通知是否打开]
+let uiIsTriggering = false; // UI触发状态 [注：防止重复打开Popup]
+const openMetamaskTabsIDs = {}; // 打开的标签页ID [注：跟踪全屏模式标签]
+const requestAccountTabIds = {}; // 请求账户的标签页ID [注：记录需要账户权限的标签]
+let controller; // 核心控制器实例 [注：延迟初始化，在setupController中赋值]
+const tabOriginMapping = {}; // 标签页来源映射 [注：存储标签页对应的DApp原点]
 
 if (inTest || process.env.METAMASK_DEBUG) {
   global.stateHooks.metamaskGetState =
-    persistenceManager.get.bind(persistenceManager);
+    persistenceManager.get.bind(persistenceManager); // 暴露调试用状态获取钩子 [注：测试环境访问存储数据]
 }
 
-const phishingPageUrl = new URL(process.env.PHISHING_WARNING_PAGE_URL);
+const phishingPageUrl = new URL(process.env.PHISHING_WARNING_PAGE_URL); // 钓鱼警告页URL [注：标准化处理URL]
 
-// normalized (adds a trailing slash to the end of the domain if it's missing)
-// the URL once and reuse it:
+// 规范化URL（如果缺少则添加域名后缀斜杠）并重复使用：
 const phishingPageHref = phishingPageUrl.toString();
 
 const ONE_SECOND_IN_MILLISECONDS = 1_000;
-// Timeout for initializing phishing warning page.
+// 初始化钓鱼警告页的超时时间。 [注：防止长时间阻塞初始化流程]
 const PHISHING_WARNING_PAGE_TIMEOUT = ONE_SECOND_IN_MILLISECONDS;
 
-// Event emitter for state persistence
+// 状态持久化事件发射器 [注：用于通知状态变更]
 export const statePersistenceEvents = new EventEmitter();
 
 if (!isManifestV3) {
   /**
-   * `onInstalled` event handler.
+   * `onInstalled`事件处理器。 [注：处理扩展安装/更新事件]
    *
-   * On MV3 builds we must listen for this event in `app-init`, otherwise we found that the listener
-   * is never called.
-   * There is no `app-init` file on MV2 builds, so we add a listener here instead.
+   * 在MV3构建中，我们必须在`app-init`中监听此事件，否则监听器永远不会被调用。
+   * MV2构建中没有`app-init`文件，因此我们在这里添加监听器。
    *
-   * @param {import('webextension-polyfill').Runtime.OnInstalledDetailsType} details - Event details.
+   * @param {import('webextension-polyfill').Runtime.OnInstalledDetailsType} details - 事件详情。
    */
   const onInstalledListener = (details) => {
     if (details.reason === 'install') {
-      onInstall();
-      browser.runtime.onInstalled.removeListener(onInstalledListener);
+      onInstall(); // 触发首次安装逻辑 [注：仅在首次安装时执行]
+      browser.runtime.onInstalled.removeListener(onInstalledListener); // 移除监听器避免重复触发
     }
   };
 
   browser.runtime.onInstalled.addListener(onInstalledListener);
 
-  // This condition is for when the `onInstalled` listener in `app-init` was called before
-  // `background.js` was loaded.
+  // 此条件处理`app-init`中的监听器在`background.js`加载前被调用的情况。
 } else if (globalThis.stateHooks.metamaskWasJustInstalled) {
-  onInstall();
-  // Delete just to clean up global namespace
+  onInstall(); // 处理MV3下的安装事件 [注：全局状态标记安装完成]
+  // 删除以清理全局命名空间
   delete globalThis.stateHooks.metamaskWasJustInstalled;
-  // This condition is for when `background.js` was loaded before the `onInstalled` listener was
-  // called.
+  // 此条件处理`background.js`加载前监听器被调用的情况。
 } else {
-  globalThis.stateHooks.metamaskTriggerOnInstall = () => onInstall();
+  globalThis.stateHooks.metamaskTriggerOnInstall = () => onInstall(); // 暴露安装触发钩子 [注：供其他模块调用]
 }
 
 /**
- * This deferred Promise is used to track whether initialization has finished.
+ * 此延迟Promise用于跟踪初始化是否完成。 [注：确保初始化状态可被外部等待]
  *
- * It is very important to ensure that `resolveInitialization` is *always*
- * called once initialization has completed, and that `rejectInitialization` is
- * called if initialization fails in an unrecoverable way.
+ * 确保在初始化完成后始终调用`resolveInitialization`，并在不可恢复的初始化失败时调用`rejectInitialization`非常重要。
  */
 const {
   promise: isInitialized,
@@ -188,146 +180,135 @@ const {
 } = deferredPromise();
 
 /**
- * 向所有标签页发送消息，通知内容脚本可以连接后台。
- * 主要用于 service worker 恢复后，重新连接 dapp。
+ * 向所有标签页发送消息，通知内容脚本可以连接后台。 [注：Service Worker恢复后重建DApp连接]
  */
 const sendReadyMessageToTabs = async () => {
   const tabs = await browser.tabs
     .query({
       /**
-       * Only query tabs that our extension can run in. To do this, we query for all URLs that our
-       * extension can inject scripts in, which is by using the "<all_urls>" value and __without__
-       * the "tabs" manifest permission. If we included the "tabs" permission, this would also fetch
-       * URLs that we'd not be able to inject in, e.g. chrome://pages, chrome://extension, which
-       * is not what we'd want.
+       * 仅查询扩展可运行的标签页。为此，我们查询所有扩展可注入脚本的URL，通过使用"<all_urls>"值且不包含"tabs"清单权限。
+       * 如果包含"tabs"权限，这还会获取我们无法注入的URL，例如chrome://页面、chrome://扩展，这不是我们想要的。
        *
-       * You might be wondering, how does the "url" param work without the "tabs" permission?
+       * 你可能想知道，没有"tabs"权限时"url"参数如何工作？
        *
        * @see {@link https://bugs.chromium.org/p/chromium/issues/detail?id=661311#c1}
-       *  "If the extension has access to inject scripts into Tab, then we can return the url
-       *   of Tab (because the extension could just inject a script to message the location.href)."
+       *  "如果扩展有权限向标签页注入脚本，那么我们可以返回标签页的URL（因为扩展可以注入脚本以消息传递location.href）。"
        */
       url: '<all_urls>',
       windowType: 'normal',
     })
     .then((result) => {
-      checkForLastErrorAndLog();
+      checkForLastErrorAndLog(); // 统一错误处理 [注：记录查询标签页时的错误]
       return result;
     })
     .catch(() => {
-      checkForLastErrorAndLog();
+      checkForLastErrorAndLog(); // 捕获异常并记录 [注：忽略查询失败]
     });
 
-  /** @todo we should only sendMessage to dapp tabs, not all tabs. */
+  /** @todo 我们应该只向DApp标签页发送消息，而不是所有标签页。 */
   for (const tab of tabs) {
     browser.tabs
       .sendMessage(tab.id, {
         name: EXTENSION_MESSAGES.READY,
       })
       .then(() => {
-        checkForLastErrorAndLog();
+        checkForLastErrorAndLog(); // 记录消息发送成功
       })
       .catch(() => {
-        // An error may happen if the contentscript is blocked from loading,
-        // and thus there is no runtime.onMessage handler to listen to the message.
-        checkForLastErrorAndLog();
+        // 如果内容脚本加载被阻止，可能会发生错误，
+        // 因此没有runtime.onMessage处理程序来监听消息。
+        checkForLastErrorAndLog(); // 记录消息发送失败 [注：内容脚本未加载时忽略]
       });
   }
 };
 
 /**
- * 启动钓鱼检测功能。
- * 注册 webRequest 拦截器，检测钓鱼页面并重定向到警告页。
- * 兼容 MV2/MV3，不同平台采用不同拦截方式。
+ * 启动钓鱼检测功能。 [注：核心安全功能，拦截恶意页面]
+ * 注册webRequest拦截器，检测钓鱼页面并重定向到警告页。
+ * 兼容MV2/MV3，不同平台采用不同拦截方式。
  *
- * @param {MetamaskController} theController - 主控制器实例
+ * @param {MetamaskController} theController - 主控制器实例 [注：依赖控制器中的钓鱼检测逻辑]
  */
-
 function maybeDetectPhishing(theController) {
   async function redirectTab(tabId, url) {
     try {
       return await browser.tabs.update(tabId, {
         url,
-      });
+      }); // 重定向标签页 [注：浏览器API操作]
     } catch (error) {
-      return sentry?.captureException(error);
+      return sentry?.captureException(error); // 捕获异常并上报Sentry [注：错误监控]
     }
   }
-  // we can use the blocking API in MV2, but not in MV3
+  // MV2支持阻塞API，MV3不支持
   const isManifestV2 = !isManifestV3;
   browser.webRequest.onBeforeRequest.addListener(
     (details) => {
       if (details.tabId === browser.tabs.TAB_ID_NONE) {
-        return {};
+        return {}; // 忽略无标签页的请求 [注：如后台请求]
       }
 
       const { completedOnboarding } = theController.onboardingController.state;
       if (!completedOnboarding) {
-        return {};
+        return {}; // 未完成引导时跳过检测 [注：新用户暂不启用钓鱼检测]
       }
 
       const prefState = theController.preferencesController.state;
       if (!prefState.usePhishDetect) {
-        return {};
+        return {}; // 用户禁用钓鱼检测时跳过 [注：尊重用户设置]
       }
 
-      // ignore requests that come from our phishing warning page, as
-      // the requests may come from the "continue to site" link, so we'll
-      // actually _want_ to bypass the phishing detection. We shouldn't have to
-      // do this, because the phishing site does tell the extension that the
-      // domain it blocked it now "safe", but it does this _after_ the request
-      // begins (which would get blocked by this listener). So we have to bail
-      // on detection here.
-      // This check can be removed once  https://github.com/MetaMask/phishing-warning/issues/160
-      // is shipped.
+      // 忽略来自钓鱼警告页的请求，因为
+      // 请求可能来自"继续访问站点"链接，因此我们实际上需要绕过钓鱼检测。
+      // 我们本不应需要这样做，因为钓鱼站点会在请求开始后（会被此监听器阻止）告诉扩展该域名现在"安全"。
+      // 此检查可在https://github.com/MetaMask/phishing-warning/issues/160发布后移除。
       if (
         details.initiator &&
         details.initiator !== 'null' &&
-        // compare normalized URLs
+        // 比较规范化的URL
         new URL(details.initiator).host === phishingPageUrl.host
       ) {
-        return {};
+        return {}; // 信任钓鱼警告页发起的请求 [注：避免循环拦截]
       }
 
       const { hostname, href, searchParams } = new URL(details.url);
       if (inTest) {
         if (searchParams.has('IN_TEST_BYPASS_EARLY_PHISHING_DETECTION')) {
-          // this is a test page that needs to bypass early phishing detection
-          return {};
+          // 这是需要绕过早期钓鱼检测的测试页面
+          return {}; // 测试环境跳过检测 [注：允许测试页面通过]
         }
       }
 
-      theController.phishingController.maybeUpdateState();
+      theController.phishingController.maybeUpdateState(); // 更新钓鱼检测状态 [注：获取最新黑名单]
 
       const blockedRequestResponse =
-        theController.phishingController.isBlockedRequest(details.url);
+        theController.phishingController.isBlockedRequest(details.url); // 检查请求是否被阻止 [注：基于本地黑名单]
 
       let phishingTestResponse;
       if (details.type === 'main_frame' || details.type === 'sub_frame') {
         phishingTestResponse = theController.phishingController.test(
           details.url,
-        );
+        ); // 执行钓鱼测试 [注：分析页面内容特征]
       }
 
-      // if the request is not blocked, and the phishing test is not blocked, return and don't show the phishing screen
+      // 如果请求未被阻止且钓鱼测试未阻止，返回不显示钓鱼屏幕
       if (!phishingTestResponse?.result && !blockedRequestResponse.result) {
         return {};
       }
 
-      // Determine the block reason based on the type
+      // 根据类型确定阻止原因
       let blockReason;
       let blockedUrl = hostname;
       if (phishingTestResponse?.result && blockedRequestResponse.result) {
-        blockReason = `${phishingTestResponse.type} and ${blockedRequestResponse.type}`;
+        blockReason = `${phishingTestResponse.type} and ${blockedRequestResponse.type}`; // 复合原因 [注：同时触发两种检测]
       } else if (phishingTestResponse?.result) {
-        blockReason = phishingTestResponse.type;
+        blockReason = phishingTestResponse.type; // 钓鱼测试触发 [注：内容匹配钓鱼特征]
       } else {
-        blockReason = blockedRequestResponse.type;
+        blockReason = blockedRequestResponse.type; // 黑名单触发 [注：域名在阻止列表中]
         blockedUrl = details.initiator;
       }
 
       theController.metaMetricsController.trackEvent({
-        // should we differentiate between background redirection and content script redirection?
+        // 是否应区分后台重定向和内容脚本重定向？
         event: MetaMetricsEventName.PhishingPageDisplayed,
         category: MetaMetricsEventCategory.Phishing,
         properties: {
@@ -338,65 +319,63 @@ function maybeDetectPhishing(theController) {
           reason: blockReason,
           requestDomain: blockedRequestResponse.result ? hostname : undefined,
         },
-      });
+      }); // 记录钓鱼事件 [注：用户行为统计]
       const querystring = new URLSearchParams({ hostname, href });
       const redirectUrl = new URL(phishingPageHref);
-      redirectUrl.hash = querystring.toString();
+      redirectUrl.hash = querystring.toString(); // 构造重定向URL [注：携带原URL参数]
       const redirectHref = redirectUrl.toString();
 
-      // blocking is better than tab redirection, as blocking will prevent
-      // the browser from loading the page at all
+      // 阻止比标签页重定向更好，因为阻止会防止浏览器加载页面
       if (isManifestV2) {
-        // We can redirect `main_frame` requests directly to the warning page.
-        // For non-`main_frame` requests (e.g. `sub_frame` or WebSocket), we cancel them
-        // and redirect the whole tab asynchronously so that the user sees the warning.
+        // 我们可以直接将`main_frame`请求重定向到警告页。
+        // 对于非`main_frame`请求（如`sub_frame`或WebSocket），我们取消它们并异步重定向整个标签页，以便用户看到警告。
         if (details.type === 'main_frame') {
-          return { redirectUrl: redirectHref };
+          return { redirectUrl: redirectHref }; // 直接重定向主框架 [注：MV2支持阻塞式重定向]
         }
-        redirectTab(details.tabId, redirectHref);
+        redirectTab(details.tabId, redirectHref); // 重定向非主框架请求 [注：先取消请求再跳转]
         return { cancel: true };
       }
-      // redirect the whole tab (even if it's a sub_frame request)
+      // 重定向整个标签页（即使是子框架请求） [注：MV3统一处理方式]
       redirectTab(details.tabId, redirectHref);
       return {};
     },
     {
-      urls: ['http://*/*', 'https://*/*', 'ws://*/*', 'wss://*/*'],
+      urls: ['http://*/*', 'https://*/*', 'ws://*/*', 'wss://*/*'], // 监控所有HTTP/WS请求 [注：全协议覆盖]
     },
-    isManifestV2 ? ['blocking'] : [],
+    isManifestV2 ? ['blocking'] : [], // MV2启用阻塞模式 [注：版本兼容性处理]
   );
 }
 
-// These are set after initialization
+// 这些在初始化后设置
 let connectRemote;
 let connectExternalExtension;
 let connectExternalCaip;
 
 browser.runtime.onConnect.addListener(async (...args) => {
-  // Queue up connection attempts here, waiting until after initialization
+  // 在此排队连接尝试，等待初始化完成 [注：确保控制器已初始化]
   await isInitialized;
 
-  // This is set in `setupController`, which is called as part of initialization
-  connectRemote(...args);
+  // 这在`setupController`中设置，作为初始化的一部分
+  connectRemote(...args); // 处理内部连接 [注：扩展内可信端口]
 });
 browser.runtime.onConnectExternal.addListener(async (...args) => {
-  // Queue up connection attempts here, waiting until after initialization
+  // 在此排队连接尝试，等待初始化完成
   await isInitialized;
-  // This is set in `setupController`, which is called as part of initialization
+  // 这在`setupController`中设置，作为初始化的一部分
 
   const port = args[0];
   const isDappConnecting = port.sender.tab?.id;
   if (isDappConnecting && process.env.MULTICHAIN_API) {
-    connectExternalCaip(...args);
+    connectExternalCaip(...args); // 处理多链DApp连接 [注：支持CAIP-26标准]
   } else {
-    connectExternalExtension(...args);
+    connectExternalExtension(...args); // 处理外部扩展连接 [注：EIP-1193标准通信]
   }
 });
 
 function saveTimestamp() {
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toISOString(); // 生成时间戳 [注：用于保持Service Worker活动]
 
-  browser.storage.session.set({ timestamp });
+  browser.storage.session.set({ timestamp }); // 保存到会话存储 [注：MV3定时触发保持服务运行]
 }
 
 /**
@@ -404,63 +383,63 @@ function saveTimestamp() {
  */
 
 /**
- * The data emitted from the MetaMaskController.store EventEmitter, also used to initialize the MetaMaskController. Available in UI on React state as state.metamask.
+ * 从MetaMaskController.store EventEmitter发出的数据，也用于初始化MetaMaskController。在UI的React状态中作为state.metamask可用。
  *
  * @typedef MetaMaskState
- * @property {boolean} isInitialized - Whether the first vault has been created.
- * @property {boolean} isUnlocked - Whether the vault is currently decrypted and accounts are available for selection.
- * @property {boolean} isAccountMenuOpen - Represents whether the main account selection UI is currently displayed.
- * @property {boolean} isNetworkMenuOpen - Represents whether the main network selection UI is currently displayed.
- * @property {object} identities - An object matching lower-case hex addresses to Identity objects with "address" and "name" (nickname) keys.
- * @property {object} networkConfigurations - A list of network configurations, containing RPC provider details (eg chainId, rpcUrl, rpcPreferences).
- * @property {Array} addressBook - A list of previously sent to addresses.
- * @property {object} marketData - A map from chain ID -> contract address -> an object containing the token's market data.
- * @property {Array} tokens - Tokens held by the current user, including their balances.
- * @property {object} send - TODO: Document
- * @property {boolean} useBlockie - Indicates preferred user identicon format. True for blockie, false for Jazzicon.
- * @property {object} featureFlags - An object for optional feature flags.
- * @property {boolean} welcomeScreen - True if welcome screen should be shown.
- * @property {string} currentLocale - A locale string matching the user's preferred display language.
- * @property {string} networkStatus - Either "unknown", "available", "unavailable", or "blocked", depending on the status of the currently selected network.
- * @property {object} accounts - An object mapping lower-case hex addresses to objects with "balance" and "address" keys, both storing hex string values.
- * @property {object} accountsByChainId - An object mapping lower-case hex addresses to objects with "balance" and "address" keys, both storing hex string values keyed by chain id.
- * @property {hex} currentBlockGasLimit - The most recently seen block gas limit, in a lower case hex prefixed string.
- * @property {object} currentBlockGasLimitByChainId - The most recently seen block gas limit, in a lower case hex prefixed string keyed by chain id.
- * @property {object} unapprovedPersonalMsgs - An object of messages pending approval, mapping a unique ID to the options.
- * @property {number} unapprovedPersonalMsgCount - The number of messages in unapprovedPersonalMsgs.
- * @property {object} unapprovedEncryptionPublicKeyMsgs - An object of messages pending approval, mapping a unique ID to the options.
- * @property {number} unapprovedEncryptionPublicKeyMsgCount - The number of messages in EncryptionPublicKeyMsgs.
- * @property {object} unapprovedDecryptMsgs - An object of messages pending approval, mapping a unique ID to the options.
- * @property {number} unapprovedDecryptMsgCount - The number of messages in unapprovedDecryptMsgs.
- * @property {object} unapprovedTypedMessages - An object of messages pending approval, mapping a unique ID to the options.
- * @property {number} unapprovedTypedMessagesCount - The number of messages in unapprovedTypedMessages.
- * @property {number} pendingApprovalCount - The number of pending request in the approval controller.
- * @property {Keyring[]} keyrings - An array of keyring descriptions, summarizing the accounts that are available for use, and what keyrings they belong to.
- * @property {string} selectedAddress - A lower case hex string of the currently selected address.
- * @property {string} currentCurrency - A string identifying the user's preferred display currency, for use in showing conversion rates.
- * @property {number} currencyRates - An object mapping of nativeCurrency to conversion rate and date
- * @property {boolean} forgottenPassword - Returns true if the user has initiated the password recovery screen, is recovering from seed phrase.
+ * @property {boolean} isInitialized - 第一个钱包是否已创建。 [注：初始化状态标记]
+ * @property {boolean} isUnlocked - 钱包当前是否已解密且账户可选择。 [注：安全状态标记]
+ * @property {boolean} isAccountMenuOpen - 表示主账户选择UI是否当前显示。 [注：UI状态跟踪]
+ * @property {boolean} isNetworkMenuOpen - 表示主网络选择UI是否当前显示。 [注：UI状态跟踪]
+ * @property {object} identities - 小写十六进制地址到包含"address"和"name"（昵称）键的Identity对象的对象。 [注：账户身份信息]
+ * @property {object} networkConfigurations - 网络配置列表，包含RPC提供程序详细信息（如chainId、rpcUrl、rpcPreferences）。 [注：多链配置存储]
+ * @property {Array} addressBook - 先前发送到的地址列表。 [注：历史地址记录]
+ * @property {object} marketData - 从链ID到合约地址到包含代币市场数据的对象的映射。 [注：市场数据缓存]
+ * @property {Array} tokens - 当前用户持有的代币，包括余额。 [注：钱包资产列表]
+ * @property {object} send - TODO: 文档 [注：待完善的发送功能状态]
+ * @property {boolean} useBlockie - 表示首选用户头像格式。true为blockie，false为Jazzicon。 [注：用户界面偏好]
+ * @property {object} featureFlags - 可选功能标志的对象。 [注：实验性功能开关]
+ * @property {boolean} welcomeScreen - 是否应显示欢迎屏幕。 [注：新用户引导]
+ * @property {string} currentLocale - 与用户首选显示语言匹配的区域设置字符串。 [注：国际化配置]
+ * @property {string} networkStatus - 根据当前所选网络的状态，为"unknown"、"available"、"unavailable"或"blocked"。 [注：网络连接状态]
+ * @property {object} accounts - 小写十六进制地址到包含"balance"和"address"键的对象的映射，均存储十六进制字符串值。 [注：账户余额信息]
+ * @property {object} accountsByChainId - 按链ID键控的小写十六进制地址到包含"balance"和"address"键的对象的映射，均存储十六进制字符串值。 [注：多链账户余额]
+ * @property {hex} currentBlockGasLimit - 最近看到的区块gas限制，采用小写十六进制前缀字符串。 [注：Gas费相关状态]
+ * @property {object} currentBlockGasLimitByChainId - 按链ID键控的最近看到的区块gas限制，采用小写十六进制前缀字符串。 [注：多链Gas费跟踪]
+ * @property {object} unapprovedPersonalMsgs - 待批准消息的对象，将唯一ID映射到选项。 [注：未批准的个人消息]
+ * @property {number} unapprovedPersonalMsgCount - unapprovedPersonalMsgs中的消息数量。 [注：计数器]
+ * @property {object} unapprovedEncryptionPublicKeyMsgs - 待批准的加密公钥消息的对象，将唯一ID映射到选项。 [注：未批准的加密请求]
+ * @property {number} unapprovedEncryptionPublicKeyMsgCount - EncryptionPublicKeyMsgs中的消息数量。 [注：计数器]
+ * @property {object} unapprovedDecryptMsgs - 待批准的解密消息的对象，将唯一ID映射到选项。 [注：未批准的解密请求]
+ * @property {number} unapprovedDecryptMsgCount - unapprovedDecryptMsgs中的消息数量。 [注：计数器]
+ * @property {object} unapprovedTypedMessages - 待批准的类型化消息的对象，将唯一ID映射到选项。 [注：未批准的类型化请求]
+ * @property {number} unapprovedTypedMessagesCount - unapprovedTypedMessages中的消息数量。 [注：计数器]
+ * @property {number} pendingApprovalCount - 批准控制器中的待处理请求数量。 [注：总待批准计数]
+ * @property {Keyring[]} keyrings - 密钥环描述数组，总结可用账户及其所属密钥环。 [注：硬件钱包管理]
+ * @property {string} selectedAddress - 当前所选地址的小写十六进制字符串。 [注：当前活动账户]
+ * @property {string} currentCurrency - 标识用户首选显示货币的字符串，用于显示汇率。 [注：法币转换配置]
+ * @property {number} currencyRates - 原生货币到汇率和日期的对象映射 [注：汇率数据]
+ * @property {boolean} forgottenPassword - 用户是否已启动密码恢复屏幕（从助记词恢复）时返回true。 [注：密码恢复状态]
  */
 
 /**
  * @typedef VersionedData
- * @property {MetaMaskState} data - The data emitted from MetaMask controller, or used to initialize it.
- * @property {number} version - The latest migration version that has been run.
+ * @property {MetaMaskState} data - 从MetaMask控制器发出的数据，或用于初始化的数据。 [注：带版本的状态数据]
+ * @property {number} version - 已运行的最新迁移版本。 [注：数据迁移版本号]
  */
 
 /**
- * Initializes the MetaMask controller, and sets up all platform configuration.
+ * 初始化MetaMask控制器，并设置所有平台配置。 [注：核心初始化流程]
  *
- * @returns {Promise} Setup complete.
+ * @returns {Promise} 安装完成。
  */
 /**
- * 初始化 MetaMask 控制器及相关平台配置。
+ * 初始化MetaMask控制器及相关平台配置。 [注：分10步完成核心初始化]
  * 1. 加载持久化状态
  * 2. 获取用户首选语言
- * 3. （测试环境）启动 mocha socket
- * 4. （MV3）定时保存时间戳，保持 service worker 存活
- * 5. 加载预装 Snaps
- * 6. 调用 setupController 完成控制器初始化
+ * 3. （测试环境）启动mocha socket
+ * 4. （MV3）定时保存时间戳，保持service worker存活
+ * 5. 加载预装Snaps
+ * 6. 调用setupController完成控制器初始化
  * 7. 启动钓鱼检测
  * 8. （MV2）预加载钓鱼警告页
  * 9. 通知所有标签页后台已准备好
@@ -468,33 +447,32 @@ function saveTimestamp() {
  */
 async function initialize() {
   try {
-    const offscreenPromise = isManifestV3 ? createOffscreen() : null;
+    const offscreenPromise = isManifestV3 ? createOffscreen() : null; // 初始化离线文档 [注：MV3特有功能]
 
-    const initData = await loadStateFromPersistence();
+    const initData = await loadStateFromPersistence(); // 加载持久化状态 [注：包含版本迁移]
 
     const initState = initData.data;
-    const initLangCode = await getFirstPreferredLangCode();
+    const initLangCode = await getFirstPreferredLangCode(); // 获取首选语言 [注：用于国际化]
 
     let isFirstMetaMaskControllerSetup;
 
-    // We only want to start this if we are running a test build, not for the release build.
-    // `navigator.webdriver` is true if Selenium, Puppeteer, or Playwright are running.
-    // In MV3, the Service Worker sees `navigator.webdriver` as `undefined`, so this will trigger from
-    // an Offscreen Document message instead. Because it's a singleton class, it's safe to start multiple times.
-    // 测试环境下启动 mocha socket
+    // 仅在运行测试构建时启动，而非发布构建。
+    // 当Selenium、Puppeteer或Playwright运行时，`navigator.webdriver`为true。
+    // 在MV3中，Service Worker将`navigator.webdriver`视为`undefined`，因此这将通过离线文档消息触发。
+    // 由于是单例类，多次启动是安全的。
+    // 测试环境下启动mocha socket [注：测试框架通信接口]
     if (process.env.IN_TEST && window.navigator?.webdriver) {
       getSocketBackgroundToMocha();
     }
 
     if (isManifestV3) {
-      // Save the timestamp immediately and then every `SAVE_TIMESTAMP_INTERVAL`
-      // miliseconds. This keeps the service worker alive.
-      // MV3 下定时保存时间戳，保持 service worker 存活
+      // 立即保存时间戳，然后每隔`SAVE_TIMESTAMP_INTERVAL`毫秒保存一次。这使服务工作线程保持活动状态。
+      // MV3下定时保存时间戳，保持service worker存活 [注：防止后台被浏览器终止]
       if (initState.PreferencesController?.enableMV3TimestampSave !== false) {
         const SAVE_TIMESTAMP_INTERVAL_MS = 2 * 1000;
 
         saveTimestamp();
-        setInterval(saveTimestamp, SAVE_TIMESTAMP_INTERVAL_MS);
+        setInterval(saveTimestamp, SAVE_TIMESTAMP_INTERVAL_MS); // 定时任务 [注：每2秒更新时间戳]
       }
 
       const sessionData = await browser.storage.session.get([
@@ -503,7 +481,7 @@ async function initialize() {
 
       isFirstMetaMaskControllerSetup =
         sessionData?.isFirstMetaMaskControllerSetup === undefined;
-      await browser.storage.session.set({ isFirstMetaMaskControllerSetup });
+      await browser.storage.session.set({ isFirstMetaMaskControllerSetup }); // 记录首次初始化状态 [注：避免重复设置]
     }
 
     const overrides = inTest
@@ -513,9 +491,9 @@ async function initialize() {
             ledgerBridge: FakeLedgerBridge,
           },
         }
-      : {};
+      : {}; // 测试覆盖项 [注：替换硬件钱包实现]
 
-    const preinstalledSnaps = await loadPreinstalledSnaps();
+    const preinstalledSnaps = await loadPreinstalledSnaps(); // 加载预装Snaps [注：第三方扩展初始化]
 
     setupController(
       initState,
@@ -525,39 +503,39 @@ async function initialize() {
       initData.meta,
       offscreenPromise,
       preinstalledSnaps,
-    );
+    ); // 初始化控制器 [注：核心模块协调]
 
-    // `setupController` sets up the `controller` object, so we can use it now:
-    maybeDetectPhishing(controller);
+    // `setupController`设置`controller`对象，现在可以使用：
+    maybeDetectPhishing(controller); // 启动钓鱼检测 [注：依赖控制器的钓鱼模块]
 
     if (!isManifestV3) {
-      await loadPhishingWarningPage();
+      await loadPhishingWarningPage(); // 预加载钓鱼页 [注：MV2需要提前加载iframe]
     }
-    await sendReadyMessageToTabs();
+    await sendReadyMessageToTabs(); // 通知标签页 [注：完成初始化标志]
     log.info('MetaMask initialization complete.');
 
-    resolveInitialization();
+    resolveInitialization(); // 标记初始化成功 [注：解除初始化Promise阻塞]
   } catch (error) {
-    rejectInitialization(error);
+    rejectInitialization(error); // 初始化失败处理 [注：触发错误流程]
   }
 }
 
 /**
- * Loads the preinstalled snaps from urls and returns them as an array.
- * It fails if any Snap fails to load in the expected time range.
+ * 从URL加载预装的snaps并作为数组返回。 [注：扩展生态初始化]
+ * 如果任何Snap在预期时间范围内加载失败，则失败。
  */
 async function loadPreinstalledSnaps() {
-  const fetchWithTimeout = getFetchWithTimeout();
+  const fetchWithTimeout = getFetchWithTimeout(); // 获取带超时的Fetch工具 [注：网络请求容错]
   const promises = PREINSTALLED_SNAPS_URLS.map(async (url) => {
     const response = await fetchWithTimeout(url);
-    return await response.json();
+    return await response.json(); // 解析Snaps配置 [注：JSON格式验证]
   });
 
-  return Promise.all(promises);
+  return Promise.all(promises); // 并行加载所有Snaps [注：提高初始化效率]
 }
 
 /**
- * An error thrown if the phishing warning page takes too long to load.
+ * 钓鱼警告页加载超时抛出的错误。 [注：超时处理类]
  */
 class PhishingWarningPageTimeoutError extends Error {
   constructor() {
@@ -566,23 +544,21 @@ class PhishingWarningPageTimeoutError extends Error {
 }
 
 /**
- * 预加载钓鱼警告页，确保 service worker 已注册，警告页可离线工作。
- * 通过创建 iframe 加载警告页，超时后自动清理。
+ * 预加载钓鱼警告页，确保service worker已注册，警告页可离线工作。 [注：提升离线场景安全性]
+ * 通过创建iframe加载警告页，超时后自动清理。
  */
 async function loadPhishingWarningPage() {
   let iframe;
   try {
     const extensionStartupPhishingPageUrl = new URL(phishingPageHref);
-    // The `extensionStartup` hash signals to the phishing warning page that it should not bother
-    // setting up streams for user interaction. Otherwise this page load would cause a console
-    // error.
-    extensionStartupPhishingPageUrl.hash = '#extensionStartup';
+    // `extensionStartup`哈希向钓鱼警告页指示不应设置用户交互流。否则此页面加载会导致控制台错误。
+    extensionStartupPhishingPageUrl.hash = '#extensionStartup'; // 附加启动参数 [注：禁用交互避免错误]
 
     iframe = window.document.createElement('iframe');
     iframe.setAttribute('src', extensionStartupPhishingPageUrl.href);
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin'); // 沙箱策略 [注：限制iframe权限]
 
-    // Create "deferred Promise" to allow passing resolve/reject to event handlers
+    // 创建延迟Promise以允许将resolve/reject传递给事件处理程序
     let deferredResolve;
     let deferredReject;
     const loadComplete = new Promise((resolve, reject) => {
@@ -590,86 +566,84 @@ async function loadPhishingWarningPage() {
       deferredReject = reject;
     });
 
-    // The load event is emitted once loading has completed, even if the loading failed.
-    // If loading failed we can't do anything about it, so we don't need to check.
-    iframe.addEventListener('load', deferredResolve);
+    // 加载事件在加载完成时发出，即使加载失败。
+    // 如果加载失败我们无法做什么，因此无需检查。
+    iframe.addEventListener('load', deferredResolve); // 监听加载完成 [注：触发Promise解析]
 
-    // This step initiates the page loading.
-    window.document.body.appendChild(iframe);
+    // 此步骤启动页面加载。
+    window.document.body.appendChild(iframe); // 插入iframe [注：预加载页面资源]
 
-    // This timeout ensures that this iframe gets cleaned up in a reasonable
-    // timeframe, and ensures that the "initialization complete" message
-    // doesn't get delayed too long.
+    // 此超时确保此iframe在合理时间内清理，并确保"初始化完成"消息不会延迟太久。
     setTimeout(
       () => deferredReject(new PhishingWarningPageTimeoutError()),
       PHISHING_WARNING_PAGE_TIMEOUT,
     );
-    await loadComplete;
+    await loadComplete; // 等待加载或超时 [注：设置1秒超时限制]
   } catch (error) {
     if (error instanceof PhishingWarningPageTimeoutError) {
       console.warn(
-        'Phishing warning page timeout; page not guaranteed to work offline.',
+        'Phishing warning page timeout; page not guaranteed to work offline.', // 记录超时警告 [注：不影响主流程]
       );
     } else {
-      console.error('Failed to initialize phishing warning page', error);
+      console.error('Failed to initialize phishing warning page', error); // 记录其他错误 [注：可能影响离线功能]
     }
   } finally {
     if (iframe) {
-      iframe.remove();
+      iframe.remove(); // 清理资源 [注：避免内存泄漏]
     }
   }
 }
 
 //
-// State and Persistence
+// 状态和持久化
 //
 
 /**
- * Loads any stored data, prioritizing the latest storage strategy.
- * Migrates that data schema in case it was last loaded on an older version.
+ * 加载任何存储的数据，优先使用最新的存储策略。 [注：跨版本兼容核心]
+ * 如果上次加载是在旧版本上，则迁移数据模式。
  *
- * @returns {Promise<MetaMaskState>} Last data emitted from previous instance of MetaMask.
+ * @returns {Promise<MetaMaskState>} 先前MetaMask实例发出的最后数据。
  */
 
 /**
- * 加载持久化存储的状态数据，并进行版本迁移。
- * 如果启用 WITH_STATE，会合并测试用例生成的状态。
+ * 加载持久化存储的状态数据，并进行版本迁移。 [注：数据迁移核心逻辑]
+ * 如果启用WITH_STATE，会合并测试用例生成的状态。
  * 迁移后将元数据写入持久化管理器，并返回迁移后的数据。
  *
  * @returns {Promise<MetaMaskState>} 返回迁移后的状态数据
  */
 export async function loadStateFromPersistence() {
-  // migrations
-  migrator.on('error', console.warn);
+  // 迁移
+  migrator.on('error', console.warn); // 监听迁移错误 [注：记录警告信息]
 
   if (process.env.WITH_STATE) {
-    const stateOverrides = await generateWalletState();
-    firstTimeState = { ...firstTimeState, ...stateOverrides };
+    const stateOverrides = await generateWalletState(); // 生成测试钱包状态 [注：测试环境数据注入]
+    firstTimeState = { ...firstTimeState, ...stateOverrides }; // 合并初始状态 [注：覆盖默认模板]
   }
 
-  // read from disk
-  // first from preferred, async API:
+  // 从磁盘读取
+  // 首先从首选的异步API：
   const preMigrationVersionedData =
     (await persistenceManager.get()) ||
-    migrator.generateInitialState(firstTimeState);
+    migrator.generateInitialState(firstTimeState); // 获取迁移前数据 [注：不存在时生成初始状态]
 
-  // report migration errors to sentry
+  // 向Sentry报告迁移错误
   migrator.on('error', (err) => {
-    // get vault structure without secrets
+    // 获取无秘密的钱包结构
     const vaultStructure = getObjStructure(preMigrationVersionedData);
     sentry.captureException(err, {
-      // "extra" key is required by Sentry
-      extra: { vaultStructure },
+      // Sentry需要"extra"键
+      extra: { vaultStructure }, // 附加数据结构信息 [注：帮助错误定位]
     });
   });
 
-  // migrate data
+  // 迁移数据
   const versionedData = await migrator.migrateData(preMigrationVersionedData);
   if (!versionedData) {
-    throw new Error('MetaMask - migrator returned undefined');
+    throw new Error('MetaMask - migrator returned undefined'); // 处理未定义结果 [注：严重错误]
   } else if (!isObject(versionedData.meta)) {
     throw new Error(
-      `MetaMask - migrator metadata has invalid type '${typeof versionedData.meta}'`,
+      `MetaMask - migrator metadata has invalid type '${typeof versionedData.meta}'`, // 元数据类型校验 [注：确保数据有效性]
     );
   } else if (typeof versionedData.meta.version !== 'number') {
     throw new Error(
@@ -681,38 +655,38 @@ export async function loadStateFromPersistence() {
       `MetaMask - migrator data has invalid type '${typeof versionedData.data}'`,
     );
   }
-  // this initializes the meta/version data as a class variable to be used for future writes
-  persistenceManager.setMetadata(versionedData.meta);
+  // 这将元数据/版本数据初始化为类变量，供未来写入使用
+  persistenceManager.setMetadata(versionedData.meta); // 设置元数据 [注：记录迁移版本]
 
-  // write to disk
-  persistenceManager.set(versionedData.data);
+  // 写入磁盘
+  persistenceManager.set(versionedData.data); // 保存迁移后状态 [注：更新持久化存储]
 
-  // return just the data
+  // 仅返回数据
   return versionedData;
 }
 
 /**
- * Emit event of DappViewed,
- * which should only be tracked only after a user opts into metrics and connected to the dapp
+ * 发送DappViewed事件， [注：用户行为统计]
+ * 仅在用户选择加入指标并连接到Dapp后跟踪。
  *
- * @param {string} origin - URL of visited dapp
+ * @param {string} origin - 访问的Dapp的URL
  */
 function emitDappViewedMetricEvent(origin) {
   const { metaMetricsId } = controller.metaMetricsController.state;
   if (!shouldEmitDappViewedEvent(metaMetricsId)) {
-    return;
+    return; // 用户未启用指标时跳过 [注：隐私保护]
   }
 
   const numberOfConnectedAccounts =
-    controller.getPermittedAccounts(origin).length;
+    controller.getPermittedAccounts(origin).length; // 获取连接的账户数 [注：权限系统查询]
   if (numberOfConnectedAccounts === 0) {
-    return;
+    return; // 无连接账户时跳过 [注：仅跟踪有交互的DApp]
   }
 
   const preferencesState = controller.controllerMessenger.call(
     'PreferencesController:getState',
   );
-  const numberOfTotalAccounts = Object.keys(preferencesState.identities).length;
+  const numberOfTotalAccounts = Object.keys(preferencesState.identities).length; // 获取总账户数 [注：用户账户统计]
 
   controller.metaMetricsController.trackEvent({
     event: MetaMetricsEventName.DappViewed,
@@ -725,98 +699,98 @@ function emitDappViewedMetricEvent(origin) {
       number_of_accounts: numberOfTotalAccounts,
       number_of_accounts_connected: numberOfConnectedAccounts,
     },
-  });
+  }); // 记录DApp访问事件 [注：分析用户与DApp交互]
 }
 
 /**
- * Track dapp connection when loaded and permissioned
+ * 当Dapp加载并获得权限时跟踪连接。 [注：实时监控DApp连接状态]
  *
- * @param {Port} remotePort - The port provided by a new context.
+ * @param {Port} remotePort - 新上下文提供的端口。
  */
 function trackDappView(remotePort) {
   if (!remotePort.sender || !remotePort.sender.tab || !remotePort.sender.url) {
-    return;
+    return; // 无效发送者时跳过 [注：防御性编程]
   }
   const tabId = remotePort.sender.tab.id;
   const url = new URL(remotePort.sender.url);
-  const { origin } = url;
+  const { origin } = url; // 提取DApp原点 [注：唯一标识DApp]
 
-  // store the orgin to corresponding tab so it can provide infor for onActivated listener
+  // 将原点存储到对应的标签页，以便为onActivated监听器提供信息
   if (!Object.keys(tabOriginMapping).includes(tabId)) {
-    tabOriginMapping[tabId] = origin;
+    tabOriginMapping[tabId] = origin; // 建立标签页与原点的映射 [注：跟踪标签页关联的DApp]
   }
 
   const isConnectedToDapp = controller.controllerMessenger.call(
     'PermissionController:hasPermissions',
     origin,
-  );
+  ); // 检查是否有权限 [注：权限系统查询]
 
-  // when open a new tab, this event will trigger twice, only 2nd time is with dapp loaded
-  const isTabLoaded = remotePort.sender.tab.title !== 'New Tab';
+  // 打开新标签页时，此事件会触发两次，仅第二次是Dapp加载完成
+  const isTabLoaded = remotePort.sender.tab.title !== 'New Tab'; // 判断标签页是否加载完成 [注：排除新标签页]
 
-  // *** Emit DappViewed metric event when ***
-  // - refresh the dapp
-  // - open dapp in a new tab
+  // *** 发送DappViewed指标事件当 ***
+  // - 刷新Dapp
+  // - 在新标签页打开Dapp
   if (isConnectedToDapp && isTabLoaded) {
-    emitDappViewedMetricEvent(origin);
+    emitDappViewedMetricEvent(origin); // 触发统计事件 [注：符合条件时记录]
   }
 }
 
 /**
- * Emit App Opened event
+ * 发送App Opened事件 [注：应用启动统计]
  */
 function emitAppOpenedMetricEvent() {
   const { metaMetricsId, participateInMetaMetrics } =
     controller.metaMetricsController.state;
 
-  // Skip if user hasn't opted into metrics
+  // 用户未选择加入指标时跳过
   if (metaMetricsId === null && !participateInMetaMetrics) {
-    return;
+    return; // 尊重用户隐私设置 [注：未授权时不记录]
   }
 
   controller.metaMetricsController.trackEvent({
     event: MetaMetricsEventName.AppOpened,
     category: MetaMetricsEventCategory.App,
-  });
+  }); // 记录应用打开事件 [注：分析用户活跃度]
 }
 
 /**
- * This function checks if the app is being opened
- * and emits an event only if no other UI instances are currently open.
+ * 此函数检查应用是否正在打开， [注：避免重复记录事件]
+ * 并仅在当前没有其他UI实例打开时发出事件。
  *
- * @param {string} environment - The environment type where the app is opening
+ * @param {string} environment - 应用打开的环境类型
  */
 function trackAppOpened(environment) {
-  // List of valid environment types to track
+  // 要跟踪的有效环境类型列表
   const environmentTypeList = [
     ENVIRONMENT_TYPE_POPUP,
     ENVIRONMENT_TYPE_NOTIFICATION,
     ENVIRONMENT_TYPE_FULLSCREEN,
-  ];
+  ]; // 支持的环境类型 [注：扩展的三种UI形态]
 
-  // Check if any UI instances are currently open
+  // 检查是否有任何UI实例当前打开
   const isFullscreenOpen = Object.values(openMetamaskTabsIDs).some(Boolean);
   const isAlreadyOpen =
-    isFullscreenOpen || notificationIsOpen || openPopupCount > 0;
+    isFullscreenOpen || notificationIsOpen || openPopupCount > 0; // 多实例检查 [注：确保首次打开时记录]
 
-  // Only emit event if no UI is open and environment is valid
+  // 仅在无UI打开且环境有效时发出事件
   if (!isAlreadyOpen && environmentTypeList.includes(environment)) {
-    emitAppOpenedMetricEvent();
+    emitAppOpenedMetricEvent(); // 触发应用打开事件 [注：首次打开时统计]
   }
 }
 
 /**
- * 初始化 MetaMask 控制器，配置平台相关参数、通知、持久化、事件订阅等。
- * 负责设置与 UI、内容脚本、外部扩展的通信通道。
+ * 初始化MetaMask控制器，配置平台相关参数、通知、持久化、事件订阅等。 [注：控制器核心配置]
+ * 负责设置与UI、内容脚本、外部扩展的通信通道。
  * 负责徽章（badge）更新、通知管理、特性开关等。
  *
- * @param {object} initState - 初始状态
- * @param {string} initLangCode - 用户首选语言
- * @param {object} overrides - 测试用覆盖项
- * @param isFirstMetaMaskControllerSetup - 是否首次初始化
- * @param {object} stateMetadata - 状态元数据
- * @param {Promise<void>} offscreenPromise - MV3 下的 offscreen 初始化 promise
- * @param {Array} preinstalledSnaps - 预装的 snaps
+ * @param {object} initState - 初始状态 [注：来自持久化存储或默认模板]
+ * @param {string} initLangCode - 用户首选语言 [注：用于界面语言设置]
+ * @param {object} overrides - 测试用覆盖项 [注：替换依赖实现]
+ * @param isFirstMetaMaskControllerSetup - 是否首次初始化 [注：避免重复初始化]
+ * @param {object} stateMetadata - 状态元数据 [注：包含迁移版本]
+ * @param {Promise<void>} offscreenPromise - MV3下的offscreen初始化promise [注：离线文档初始化]
+ * @param {Array} preinstalledSnaps - 预装的snaps [注：第三方扩展列表]
  */
 export function setupController(
   initState,
@@ -831,33 +805,34 @@ export function setupController(
   // MetaMask Controller
   //
   controller = new MetamaskController({
-    infuraProjectId: process.env.INFURA_PROJECT_ID,
-    // User confirmation callbacks:
-    showUserConfirmation: triggerUi,
-    // initial state
+    infuraProjectId: process.env.INFURA_PROJECT_ID, // Infura项目ID [注：以太坊节点配置]
+    // 用户确认回调：
+    showUserConfirmation: triggerUi, // 触发UI确认 [注：打开Popup让用户处理]
+    // 初始状态
     initState,
-    // initial locale code
+    // 初始区域代码
     initLangCode,
-    // platform specific api
+    // 平台特定API
     platform,
     notificationManager,
     browser,
     getRequestAccountTabIds: () => {
-      return requestAccountTabIds;
+      return requestAccountTabIds; // 获取请求账户的标签页ID [注：权限请求跟踪]
     },
     getOpenMetamaskTabsIds: () => {
-      return openMetamaskTabsIDs;
+      return openMetamaskTabsIDs; // 获取打开的MetaMask标签页ID [注：多标签管理]
     },
-    persistenceManager,
-    overrides,
-    isFirstMetaMaskControllerSetup,
-    currentMigrationVersion: stateMetadata.version,
-    featureFlags: {},
-    offscreenPromise,
-    preinstalledSnaps,
+    persistenceManager, // 注入持久化管理器 [注：状态存储依赖]
+    overrides, // 注入覆盖项 [注：测试环境依赖替换]
+    isFirstMetaMaskControllerSetup, // 首次初始化标记 [注：控制器内部配置]
+    currentMigrationVersion: stateMetadata.version, // 当前迁移版本 [注：数据兼容性处理]
+    featureFlags: {}, // 特性标志 [注：实验功能开关]
+    offscreenPromise, // 离线文档Promise [注：MV3功能支持]
+    preinstalledSnaps, // 注入预装Snaps [注：扩展生态初始化]
   });
 
   setupEnsIpfsResolver({
+    // 配置ENS/IPFS解析器 [注：去中心化域名解析]
     getCurrentChainId: () =>
       getCurrentChainId({ metamask: controller.networkController.state }),
     getIpfsGateway: controller.preferencesController.getIpfsGateway.bind(
@@ -868,49 +843,48 @@ export function setupController(
     provider: controller.provider,
   });
 
-  // setup state persistence
+  // 设置状态持久化
   pipeline(
-    storeAsStream(controller.store),
-    debounce(1000),
+    storeAsStream(controller.store), // 将状态转换为流 [注：响应式状态管理]
+    debounce(1000), // 去重处理 [注：避免频繁写入]
     createStreamSink(async (state) => {
-      await persistenceManager.set(state);
-      statePersistenceEvents.emit('state-persisted', state);
+      await persistenceManager.set(state); // 写入持久化存储 [注：异步保存状态]
+      statePersistenceEvents.emit('state-persisted', state); // 发出持久化事件 [注：通知监听器]
     }),
     (error) => {
-      log.error('MetaMask - Persistence pipeline failed', error);
+      log.error('MetaMask - Persistence pipeline failed', error); // 记录持久化错误 [注：关键功能监控]
     },
   );
 
-  setupSentryGetStateGlobal(controller);
+  setupSentryGetStateGlobal(controller); // 配置Sentry全局状态钩子 [注：错误监控增强]
 
   const isClientOpenStatus = () => {
     return (
-      openPopupCount > 0 ||
-      Boolean(Object.keys(openMetamaskTabsIDs).length) ||
-      notificationIsOpen
+      openPopupCount > 0 || // Popup打开计数 [注：UI状态判断]
+      Boolean(Object.keys(openMetamaskTabsIDs).length) || // 全屏标签页计数 [注：多标签状态判断]
+      notificationIsOpen // 通知窗口状态 [注：通知界面状态判断]
     );
   };
 
   const onCloseEnvironmentInstances = (isClientOpen, environmentType) => {
-    // if all instances of metamask are closed we call a method on the controller to stop gasFeeController polling
+    // 如果所有MetaMask实例都关闭，调用控制器方法停止gasFeeController轮询
     if (isClientOpen === false) {
-      controller.onClientClosed();
-      // otherwise we want to only remove the polling tokens for the environment type that has closed
+      controller.onClientClosed(); // 客户端关闭处理 [注：停止后台轮询]
+      // 否则我们只想移除已关闭环境类型的轮询令牌
     } else {
-      // in the case of fullscreen environment a user might have multiple tabs open so we don't want to disconnect all of
-      // its corresponding polling tokens unless all tabs are closed.
+      // 对于全屏环境，用户可能打开多个标签页，因此除非所有标签页关闭，否则不想断开所有对应的轮询令牌。
       if (
         environmentType === ENVIRONMENT_TYPE_FULLSCREEN &&
         Boolean(Object.keys(openMetamaskTabsIDs).length)
       ) {
-        return;
+        return; // 多标签时不处理 [注：避免误判全屏模式状态]
       }
-      controller.onEnvironmentTypeClosed(environmentType);
+      controller.onEnvironmentTypeClosed(environmentType); // 环境类型关闭处理 [注：释放对应资源]
     }
   };
 
   /**
-   * A runtime.Port object, as provided by the browser:
+   * 浏览器提供的runtime.Port对象：
    *
    * @see https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/runtime/Port
    * @typedef Port
@@ -918,75 +892,75 @@ export function setupController(
    */
 
   /**
-   * Connects a Port to the MetaMask controller via a multiplexed duplex stream.
-   * This method identifies trusted (MetaMask) interfaces, and connects them differently from untrusted (web pages).
+   * 通过多路复用双工流将Port连接到MetaMask控制器。 [注：通信核心逻辑]
+   * 此方法识别可信（MetaMask）接口，并与不可信（网页）接口不同地连接它们。
    *
-   * @param {Port} remotePort - The port provided by a new context.
+   * @param {Port} remotePort - 新上下文提供的端口。
    */
   connectRemote = async (remotePort) => {
     const processName = remotePort.name;
 
     if (metamaskBlockedPorts.includes(remotePort.name)) {
-      return;
+      return; // 阻塞端口时跳过 [注：安全策略]
     }
 
     let isMetaMaskInternalProcess = false;
     const senderUrl = remotePort.sender?.url
       ? new URL(remotePort.sender.url)
-      : null;
+      : null; // 发送者URL解析 [注：判断是否为内部进程]
 
     if (isFirefox) {
-      isMetaMaskInternalProcess = metamaskInternalProcessHash[processName];
+      isMetaMaskInternalProcess = metamaskInternalProcessHash[processName]; // Firefox下通过名称判断 [注：浏览器差异处理]
     } else {
       isMetaMaskInternalProcess =
-        senderUrl?.origin === `chrome-extension://${browser.runtime.id}`;
+        senderUrl?.origin === `chrome-extension://${browser.runtime.id}`; // Chrome下通过扩展原点判断 [注：可信来源校验]
     }
 
     if (isMetaMaskInternalProcess) {
       const portStream =
-        overrides?.getPortStream?.(remotePort) || new PortStream(remotePort);
-      // communication with popup
+        overrides?.getPortStream?.(remotePort) || new PortStream(remotePort); // 创建端口流 [注：内部通信通道]
+      // 与Popup通信
       controller.isClientOpen = true;
-      controller.setupTrustedCommunication(portStream, remotePort.sender);
-      trackAppOpened(processName);
+      controller.setupTrustedCommunication(portStream, remotePort.sender); // 设置可信通信 [注：内部接口特权]
+      trackAppOpened(processName); // 跟踪应用打开事件 [注：UI初始化统计]
 
-      initializeRemoteFeatureFlags();
+      initializeRemoteFeatureFlags(); // 初始化远程特性标志 [注：获取最新功能开关]
 
       if (processName === ENVIRONMENT_TYPE_POPUP) {
-        openPopupCount += 1;
+        openPopupCount += 1; // Popup计数增加 [注：跟踪打开次数]
         finished(portStream, () => {
-          openPopupCount -= 1;
+          openPopupCount -= 1; // Popup关闭计数减少 [注：流结束时触发]
           const isClientOpen = isClientOpenStatus();
           controller.isClientOpen = isClientOpen;
-          onCloseEnvironmentInstances(isClientOpen, ENVIRONMENT_TYPE_POPUP);
+          onCloseEnvironmentInstances(isClientOpen, ENVIRONMENT_TYPE_POPUP); // 处理环境关闭 [注：释放Popup资源]
         });
       }
 
       if (processName === ENVIRONMENT_TYPE_NOTIFICATION) {
-        notificationIsOpen = true;
+        notificationIsOpen = true; // 通知窗口打开 [注：状态标记]
 
         finished(portStream, () => {
-          notificationIsOpen = false;
+          notificationIsOpen = false; // 通知窗口关闭 [注：流结束时更新状态]
           const isClientOpen = isClientOpenStatus();
           controller.isClientOpen = isClientOpen;
           onCloseEnvironmentInstances(
             isClientOpen,
-            ENVIRONMENT_TYPE_NOTIFICATION,
+            ENVIRONMENT_TYPE_NOTIFICATION, // 处理通知关闭 [注：释放通知资源]
           );
         });
       }
 
       if (processName === ENVIRONMENT_TYPE_FULLSCREEN) {
         const tabId = remotePort.sender.tab.id;
-        openMetamaskTabsIDs[tabId] = true;
+        openMetamaskTabsIDs[tabId] = true; // 记录全屏标签页 [注：多标签管理]
 
         finished(portStream, () => {
-          delete openMetamaskTabsIDs[tabId];
+          delete openMetamaskTabsIDs[tabId]; // 移除全屏标签页记录 [注：标签页关闭时清理]
           const isClientOpen = isClientOpenStatus();
           controller.isClientOpen = isClientOpen;
           onCloseEnvironmentInstances(
             isClientOpen,
-            ENVIRONMENT_TYPE_FULLSCREEN,
+            ENVIRONMENT_TYPE_FULLSCREEN, // 处理全屏关闭 [注：释放全屏资源]
           );
         });
       }
@@ -996,25 +970,25 @@ export function setupController(
       senderUrl.pathname === phishingPageUrl.pathname
     ) {
       const portStreamForPhishingPage =
-        overrides?.getPortStream?.(remotePort) || new PortStream(remotePort);
+        overrides?.getPortStream?.(remotePort) || new PortStream(remotePort); // 创建钓鱼页通信流 [注：安全页面专用通道]
       controller.setupPhishingCommunication({
         connectionStream: portStreamForPhishingPage,
-      });
+      }); // 设置钓鱼页通信 [注：接收用户在钓鱼页的操作]
     } else {
-      // this is triggered when a new tab is opened, or origin(url) is changed
+      // 新标签页打开或原点(url)改变时触发
       if (remotePort.sender && remotePort.sender.tab && remotePort.sender.url) {
         const tabId = remotePort.sender.tab.id;
         const url = new URL(remotePort.sender.url);
-        const { origin } = url;
+        const { origin } = url; // 提取DApp原点 [注：用于权限和统计]
 
-        trackDappView(remotePort);
+        trackDappView(remotePort); // 跟踪DApp视图 [注：触发统计事件]
 
         remotePort.onMessage.addListener((msg) => {
           if (
             msg.data &&
             msg.data.method === MESSAGE_TYPE.ETH_REQUEST_ACCOUNTS
           ) {
-            requestAccountTabIds[origin] = tabId;
+            requestAccountTabIds[origin] = tabId; // 记录请求账户的标签页 [注：权限请求跟踪]
           }
         });
       }
@@ -1025,158 +999,158 @@ export function setupController(
         )
       ) {
         const portStreamForCookieHandlerPage =
-          overrides?.getPortStream?.(remotePort) || new PortStream(remotePort);
+          overrides?.getPortStream?.(remotePort) || new PortStream(remotePort); // 创建Cookie处理流 [注：白名单域名专用通道]
         controller.setUpCookieHandlerCommunication({
           connectionStream: portStreamForCookieHandlerPage,
-        });
+        }); // 设置Cookie处理通信 [注：允许白名单域名交互]
       }
-      connectExternalExtension(remotePort);
+      connectExternalExtension(remotePort); // 连接外部扩展 [注：不可信通信处理]
     }
   };
 
-  // communication with page or other extension
+  // 与页面或其他扩展通信
   connectExternalExtension = (remotePort) => {
     const portStream =
-      overrides?.getPortStream?.(remotePort) || new PortStream(remotePort);
+      overrides?.getPortStream?.(remotePort) || new PortStream(remotePort); // 创建外部通信流 [注：遵循EIP-1193标准]
     controller.setupUntrustedCommunicationEip1193({
       connectionStream: portStream,
       sender: remotePort.sender,
-    });
+    }); // 设置不可信通信 [注：外部DApp通信安全处理]
   };
 
   connectExternalCaip = async (remotePort) => {
     if (!process.env.MULTICHAIN_API) {
-      return;
+      return; // 未启用多链API时跳过 [注：功能开关控制]
     }
 
     if (metamaskBlockedPorts.includes(remotePort.name)) {
-      return;
+      return; // 阻塞端口时跳过 [注：安全策略]
     }
 
-    // this is triggered when a new tab is opened, or origin(url) is changed
+    // 新标签页打开或原点(url)改变时触发
     if (remotePort.sender && remotePort.sender.tab && remotePort.sender.url) {
-      trackDappView(remotePort);
+      trackDappView(remotePort); // 跟踪DApp视图 [注：多链DApp支持]
     }
 
     const portStream =
-      overrides?.getPortStream?.(remotePort) || new PortStream(remotePort);
+      overrides?.getPortStream?.(remotePort) || new PortStream(remotePort); // 创建CAIP通信流 [注：支持CAIP-26标准]
 
     controller.setupUntrustedCommunicationCaip({
       connectionStream: portStream,
       sender: remotePort.sender,
-    });
+    }); // 设置不可信CAIP通信 [注：多链环境下的通信处理]
   };
 
   if (overrides?.registerConnectListeners) {
-    overrides.registerConnectListeners(connectRemote, connectExternalExtension);
+    overrides.registerConnectListeners(connectRemote, connectExternalExtension); // 注册连接监听器 [注：测试环境扩展]
   }
 
   //
-  // User Interface setup
+  // 用户界面设置
   //
-  updateBadge();
+  updateBadge(); // 初始化徽章 [注：设置初始显示]
 
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.DECRYPT_MESSAGE_MANAGER_UPDATE_BADGE,
-    updateBadge,
+    updateBadge, // 订阅解密消息更新 [注：实时刷新徽章]
   );
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.ENCRYPTION_PUBLIC_KEY_MANAGER_UPDATE_BADGE,
-    updateBadge,
+    updateBadge, // 订阅加密公钥更新 [注：实时刷新徽章]
   );
   controller.signatureController.hub.on(
     METAMASK_CONTROLLER_EVENTS.UPDATE_BADGE,
-    updateBadge,
+    updateBadge, // 订阅签名更新 [注：实时刷新徽章]
   );
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.APP_STATE_UNLOCK_CHANGE,
-    updateBadge,
+    updateBadge, // 订阅解锁状态变化 [注：实时刷新徽章]
   );
 
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.APPROVAL_STATE_CHANGE,
-    updateBadge,
+    updateBadge, // 订阅批准状态变化 [注：实时刷新徽章]
   );
 
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.METAMASK_NOTIFICATIONS_LIST_UPDATED,
-    updateBadge,
+    updateBadge, // 订阅通知列表更新 [注：实时刷新徽章]
   );
 
   controller.controllerMessenger.subscribe(
     METAMASK_CONTROLLER_EVENTS.METAMASK_NOTIFICATIONS_MARK_AS_READ,
-    updateBadge,
+    updateBadge, // 订阅通知已读标记 [注：实时刷新徽章]
   );
 
   /**
-   * Formats a count for display as a badge label.
+   * 格式化计数以显示为徽章标签。 [注：用户界面组件]
    *
-   * @param {number} count - The count to be formatted.
-   * @param {number} maxCount - The maximum count to display before using the '+' suffix.
-   * @returns {string} The formatted badge label.
+   * @param {number} count - 要格式化的计数。
+   * @param {number} maxCount - 使用'+'后缀前的最大显示计数。
+   * @returns {string} 格式化后的徽章标签。
    */
   function getBadgeLabel(count, maxCount) {
-    return count > maxCount ? `${maxCount}+` : String(count);
+    return count > maxCount ? `${maxCount}+` : String(count); // 超过最大值显示为9+ [注：用户体验优化]
   }
 
   /**
-   * Updates the Web Extension's "badge" number, on the little fox in the toolbar.
-   * The number reflects the current number of pending transactions or message signatures needing user approval.
+   * 更新浏览器扩展的"徽章"数字，位于工具栏的小狐狸上。 [注：关键用户通知]
+   * 数字反映需要用户批准的待处理交易或消息签名的当前数量。
    */
   function updateBadge() {
-    const pendingApprovalCount = getPendingApprovalCount();
-    const unreadNotificationsCount = getUnreadNotificationsCount();
+    const pendingApprovalCount = getPendingApprovalCount(); // 获取待批准计数 [注：权限请求统计]
+    const unreadNotificationsCount = getUnreadNotificationsCount(); // 获取未读通知计数 [注：通知系统统计]
 
     let label = '';
-    let badgeColor = BADGE_COLOR_APPROVAL;
+    let badgeColor = BADGE_COLOR_APPROVAL; // 默认审批颜色 [注：蓝色表示待处理]
 
     if (pendingApprovalCount) {
-      label = getBadgeLabel(pendingApprovalCount, BADGE_MAX_COUNT);
+      label = getBadgeLabel(pendingApprovalCount, BADGE_MAX_COUNT); // 待批准时显示计数 [注：用户交互提示]
     } else if (unreadNotificationsCount > 0) {
-      label = getBadgeLabel(unreadNotificationsCount, BADGE_MAX_COUNT);
-      badgeColor = BADGE_COLOR_NOTIFICATION;
+      label = getBadgeLabel(unreadNotificationsCount, BADGE_MAX_COUNT); // 未读通知时显示计数 [注：红色提示]
+      badgeColor = BADGE_COLOR_NOTIFICATION; // 切换为通知颜色 [注：视觉区分]
     }
 
     try {
       const badgeText = { text: label };
-      const badgeBackgroundColor = { color: badgeColor };
+      const badgeBackgroundColor = { color: badgeColor }; // 设置徽章样式 [注：浏览器API调用]
 
       if (isManifestV3) {
         browser.action.setBadgeText(badgeText);
-        browser.action.setBadgeBackgroundColor(badgeBackgroundColor);
+        browser.action.setBadgeBackgroundColor(badgeBackgroundColor); // MV3设置方式 [注：新版本API]
       } else {
         browser.browserAction.setBadgeText(badgeText);
-        browser.browserAction.setBadgeBackgroundColor(badgeBackgroundColor);
+        browser.browserAction.setBadgeBackgroundColor(badgeBackgroundColor); // MV2设置方式 [注：旧版本兼容]
       }
     } catch (error) {
-      console.error('Error updating browser badge:', error);
+      console.error('Error updating browser badge:', error); // 记录徽章更新错误 [注：界面功能监控]
     }
   }
 
   /**
-   * Initializes remote feature flags by making a request to fetch them from the clientConfigApi.
-   * This function is called when MM is during internal process.
-   * If the request fails, the error will be logged but won't interrupt extension initialization.
+   * 通过请求从clientConfigApi获取远程特性标志来初始化它们。 [注：动态功能开关]
+   * 此函数在MM处于内部进程时调用。
+   * 如果请求失败，错误将被记录但不会中断扩展初始化。
    *
-   * @returns {Promise<void>} A promise that resolves when the remote feature flags have been updated.
+   * @returns {Promise<void>} 远程特性标志更新完成时解析的Promise。
    */
   async function initializeRemoteFeatureFlags() {
     try {
-      // initialize the request to fetch remote feature flags
-      await controller.remoteFeatureFlagController.updateRemoteFeatureFlags();
+      // 初始化获取远程特性标志的请求
+      await controller.remoteFeatureFlagController.updateRemoteFeatureFlags(); // 远程获取特性标志 [注：动态配置]
     } catch (error) {
-      log.error('Error initializing remote feature flags:', error);
+      log.error('Error initializing remote feature flags:', error); // 记录初始化错误 [注：不影响主流程]
     }
   }
 
   function getPendingApprovalCount() {
     try {
       const pendingApprovalCount =
-        controller.appStateController.waitingForUnlock.length +
-        controller.approvalController.getTotalApprovalCount();
+        controller.appStateController.waitingForUnlock.length + // 等待解锁的请求 [注：安全状态相关]
+        controller.approvalController.getTotalApprovalCount(); // 待批准的总请求 [注：权限系统统计]
       return pendingApprovalCount;
     } catch (error) {
-      console.error('Failed to get pending approval count:', error);
+      console.error('Failed to get pending approval count:', error); // 记录获取错误 [注：防御性编程]
       return 0;
     }
   }
@@ -1184,7 +1158,7 @@ export function setupController(
   function getUnreadNotificationsCount() {
     try {
       const { isNotificationServicesEnabled, isFeatureAnnouncementsEnabled } =
-        controller.notificationServicesController.state;
+        controller.notificationServicesController.state; // 获取通知服务状态 [注：功能开关]
 
       const snapNotificationCount = Object.values(
         controller.notificationServicesController.state
@@ -1192,14 +1166,14 @@ export function setupController(
       ).filter(
         (notification) =>
           notification.type ===
-            NotificationServicesController.Constants.TRIGGER_TYPES.SNAP &&
+            NotificationServicesController.Constants.TRIGGER_TYPES.SNAP && // Snap通知过滤 [注：第三方扩展通知]
           notification.readDate === null,
       ).length;
 
       const featureAnnouncementCount = isFeatureAnnouncementsEnabled
         ? controller.notificationServicesController.state.metamaskNotificationsList.filter(
             (notification) =>
-              !notification.isRead &&
+              !notification.isRead && // 未读过滤 [注：新功能通知]
               notification.type ===
                 NotificationServicesController.Constants.TRIGGER_TYPES
                   .FEATURES_ANNOUNCEMENT,
@@ -1209,7 +1183,7 @@ export function setupController(
       const walletNotificationCount = isNotificationServicesEnabled
         ? controller.notificationServicesController.state.metamaskNotificationsList.filter(
             (notification) =>
-              !notification.isRead &&
+              !notification.isRead && // 未读过滤 [注：钱包相关通知]
               notification.type !==
                 NotificationServicesController.Constants.TRIGGER_TYPES
                   .FEATURES_ANNOUNCEMENT &&
@@ -1219,13 +1193,13 @@ export function setupController(
         : 0;
 
       const unreadNotificationsCount =
-        snapNotificationCount +
+        snapNotificationCount + // 汇总各类未读通知 [注：多类型通知统计]
         featureAnnouncementCount +
         walletNotificationCount;
 
       return unreadNotificationsCount;
     } catch (error) {
-      console.error('Failed to get unread notifications count:', error);
+      console.error('Failed to get unread notifications count:', error); // 记录获取错误 [注：防御性编程]
       return 0;
     }
   }
@@ -1234,105 +1208,105 @@ export function setupController(
     NOTIFICATION_MANAGER_EVENTS.POPUP_CLOSED,
     ({ automaticallyClosed }) => {
       if (!automaticallyClosed) {
-        rejectUnapprovedNotifications();
+        rejectUnapprovedNotifications(); // 手动关闭时拒绝未批准通知 [注：安全处理]
       } else if (getPendingApprovalCount() > 0) {
-        triggerUi();
+        triggerUi(); // 自动关闭但仍有待批准请求时重新触发UI [注：用户交互引导]
       }
 
-      updateBadge();
+      updateBadge(); // 关闭后刷新徽章 [注：状态同步]
     },
   );
 
   function rejectUnapprovedNotifications() {
     controller.signatureController.rejectUnapproved(
-      REJECT_NOTIFICATION_CLOSE_SIG,
+      REJECT_NOTIFICATION_CLOSE_SIG, // 拒绝未批准的签名请求 [注：批量操作]
     );
     controller.decryptMessageController.rejectUnapproved(
-      REJECT_NOTIFICATION_CLOSE,
+      REJECT_NOTIFICATION_CLOSE, // 拒绝未批准的解密请求 [注：批量操作]
     );
     controller.encryptionPublicKeyController.rejectUnapproved(
-      REJECT_NOTIFICATION_CLOSE,
+      REJECT_NOTIFICATION_CLOSE, // 拒绝未批准的加密公钥请求 [注：批量操作]
     );
 
-    controller.rejectAllPendingApprovals();
+    controller.rejectAllPendingApprovals(); // 拒绝所有待批准请求 [注：安全策略]
   }
 
-  // Updates the snaps registry and check for newly blocked snaps to block if the user has at least one snap installed that isn't preinstalled.
+  // 如果用户安装了至少一个非预装的snap，更新snap注册表并检查新阻止的snap以进行阻止。
   if (
     Object.values(controller.snapController.state.snaps).some(
-      (snap) => !snap.preinstalled,
+      (snap) => !snap.preinstalled, // 检查是否有非预装Snap [注：第三方扩展管理]
     )
   ) {
-    controller.snapController.updateBlockedSnaps();
+    controller.snapController.updateBlockedSnaps(); // 更新阻止的Snaps [注：安全扫描]
   }
 }
 
 //
-// Etc...
+// 其他...
 //
 
 /**
- * Opens the browser popup for user confirmation
+ * 打开浏览器Popup供用户确认 [注：核心交互入口]
  */
 async function triggerUi() {
-  const tabs = await platform.getActiveTabs();
+  const tabs = await platform.getActiveTabs(); // 获取活动标签页 [注：判断当前状态]
   const currentlyActiveMetamaskTab = Boolean(
-    tabs.find((tab) => openMetamaskTabsIDs[tab.id]),
+    tabs.find((tab) => openMetamaskTabsIDs[tab.id]), // 检查是否有活动的MetaMask标签页 [注：避免重复打开]
   );
-  // Vivaldi is not closing port connection on popup close, so openPopupCount does not work correctly
-  // To be reviewed in the future if this behaviour is fixed - also the way we determine isVivaldi variable might change at some point
+  // Vivaldi在Popup关闭时不关闭端口连接，因此openPopupCount无法正确工作
+  // 未来如果此行为修复则需要重新审视 - 同时我们确定isVivaldi变量的方式可能会在某个时候改变
   const isVivaldi =
     tabs.length > 0 &&
     tabs[0].extData &&
-    tabs[0].extData.indexOf('vivaldi_tab') > -1;
+    tabs[0].extData.indexOf('vivaldi_tab') > -1; // 检测Vivaldi浏览器 [注：浏览器兼容性处理]
   if (
-    !uiIsTriggering &&
-    (isVivaldi || openPopupCount === 0) &&
-    !currentlyActiveMetamaskTab
+    !uiIsTriggering && // 非触发状态 [注：防止并发]
+    (isVivaldi || openPopupCount === 0) && // Vivaldi特殊处理或无Popup打开 [注：条件判断]
+    !currentlyActiveMetamaskTab // 无活动标签页 [注：用户交互引导]
   ) {
     uiIsTriggering = true;
     try {
       const currentPopupId = controller.appStateController.getCurrentPopupId();
       await notificationManager.showPopup(
         (newPopupId) =>
-          controller.appStateController.setCurrentPopupId(newPopupId),
+          controller.appStateController.setCurrentPopupId(newPopupId), // 设置当前Popup ID [注：管理多个Popup实例]
         currentPopupId,
       );
     } finally {
-      uiIsTriggering = false;
+      uiIsTriggering = false; // 重置触发状态 [注：确保单次触发]
     }
   }
 }
 
-// It adds the "App Installed" event into a queue of events, which will be tracked only after a user opts into metrics.
+// 将"App Installed"事件添加到事件队列，仅在用户选择加入指标后跟踪。
 const addAppInstalledEvent = () => {
   if (controller) {
     controller.metaMetricsController.updateTraits({
       [MetaMetricsUserTrait.InstallDateExt]: new Date()
         .toISOString()
-        .split('T')[0], // yyyy-mm-dd
+        .split('T')[0], // yyyy-mm-dd [注：记录安装日期]
     });
     controller.metaMetricsController.addEventBeforeMetricsOptIn({
       category: MetaMetricsEventCategory.App,
       event: MetaMetricsEventName.AppInstalled,
       properties: {},
-    });
+    }); // 添加安装事件 [注：用户转化统计]
     return;
   }
   setTimeout(() => {
-    // If the controller is not set yet, we wait and try to add the "App Installed" event again.
-    addAppInstalledEvent();
+    // 控制器未设置时，等待并重试
+    addAppInstalledEvent(); // 重试机制 [注：确保事件记录]
   }, 500);
 };
 
 /**
- * Trigger actions that should happen only upon initial install (e.g. open tab for onboarding).
+ * 触发仅在首次安装时发生的操作（如打开引导标签页）。 [注：新用户引导]
  */
 function onInstall() {
-  log.debug('First install detected');
-  addAppInstalledEvent();
+  log.debug('First install detected'); // 记录首次安装 [注：调试日志]
+  addAppInstalledEvent(); // 添加安装事件 [注：统计上报]
   if (!process.env.IN_TEST && !process.env.METAMASK_DEBUG) {
-    platform.openExtensionInBrowser();
+    platform.openExtensionInBrowser(); // 打开扩展页面 [注：引导用户配置]
   }
 }
 
@@ -1340,16 +1314,16 @@ function onNavigateToTab() {
   browser.tabs.onActivated.addListener((onActivatedTab) => {
     if (controller) {
       const { tabId } = onActivatedTab;
-      const currentOrigin = tabOriginMapping[tabId];
-      // *** Emit DappViewed metric event when ***
-      // - navigate to a connected dapp
+      const currentOrigin = tabOriginMapping[tabId]; // 获取标签页关联的原点 [注：DApp跟踪]
+      // *** 发送DappViewed指标事件当 ***
+      // - 导航到已连接的Dapp
       if (currentOrigin) {
         const connectSitePermissions =
-          controller.permissionController.state.subjects[currentOrigin];
-        // when the dapp is not connected, connectSitePermissions is undefined
+          controller.permissionController.state.subjects[currentOrigin]; // 获取站点权限 [注：判断连接状态]
+        // 当Dapp未连接时，connectSitePermissions为undefined
         const isConnectedToDapp = connectSitePermissions !== undefined;
         if (isConnectedToDapp) {
-          emitDappViewedMetricEvent(currentOrigin);
+          emitDappViewedMetricEvent(currentOrigin); // 触发统计事件 [注：用户行为跟踪]
         }
       }
     }
@@ -1359,14 +1333,14 @@ function onNavigateToTab() {
 function setupSentryGetStateGlobal(store) {
   global.stateHooks.getSentryAppState = function () {
     const backgroundState = store.memStore.getState();
-    return maskObject(backgroundState, SENTRY_BACKGROUND_STATE);
+    return maskObject(backgroundState, SENTRY_BACKGROUND_STATE); // 掩码敏感数据 [注：安全上报状态]
   };
 }
 
 /**
- * 初始化 MetaMask 后台主进程。
+ * 初始化MetaMask后台主进程。 [注：启动入口]
  * 负责监听页面切换事件，并启动主初始化流程。
- * 如果处于测试环境，初始化完成后会通知 offscreen 文档或设置页面标记。
+ * 如果处于测试环境，初始化完成后会通知offscreen文档或设置页面标记。
  * 初始化完成后会清理最近一次持久化的状态。
  */
 async function initBackground() {
