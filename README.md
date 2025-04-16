@@ -1,65 +1,66 @@
-# MetaMask Browser Extension
+# MetaMask 浏览器扩展
 
-You can find the latest version of MetaMask on [our official website](https://metamask.io/). For help using MetaMask, visit our [User Support Site](https://support.metamask.io/).
+你可以在[我们的官方网站](https://metamask.io/)找到 MetaMask 的最新版本。如需使用帮助，请访问我们的[用户支持网站](https://support.metamask.io/)。
 
-For [general questions](https://community.metamask.io/c/learn/26), [feature requests](https://community.metamask.io/c/feature-requests-ideas/13), or [developer questions](https://community.metamask.io/c/developer-questions/11), visit our [Community Forum](https://community.metamask.io/).
+如有[常见问题](https://community.metamask.io/c/learn/26)、[功能请求](https://community.metamask.io/c/feature-requests-ideas/13)或[开发者问题](https://community.metamask.io/c/developer-questions/11)，请访问我们的[社区论坛](https://community.metamask.io/)。
 
-MetaMask supports Firefox, Google Chrome, and Chromium-based browsers. We recommend using the latest available browser version.
+MetaMask 支持 Firefox、Google Chrome 以及基于 Chromium 的浏览器。我们建议使用最新版本的浏览器。
 
-For up to the minute news, follow us on [X](https://x.com/MetaMask).
+获取最新资讯，请关注我们的 [X](https://x.com/MetaMask)。
 
-To learn how to develop MetaMask-compatible applications, visit our [Developer Docs](https://docs.metamask.io/).
+如需了解如何开发兼容 MetaMask 的应用，请访问我们的[开发者文档](https://docs.metamask.io/)。
 
-To learn how to contribute to the MetaMask codebase, visit our [Contributor Docs](https://github.com/MetaMask/contributor-docs).
+如需了解如何为 MetaMask 代码库做贡献，请访问我们的[贡献者文档](https://github.com/MetaMask/contributor-docs)。
 
-To learn how to contribute to the MetaMask Extension project itself, visit our [Extension Docs](https://github.com/MetaMask/metamask-extension/tree/main/docs).
+如需了解如何为 MetaMask Extension 项目本身做贡献，请访问我们的[扩展文档](https://github.com/MetaMask/metamask-extension/tree/main/docs)。
 
-## GitHub Codespaces quickstart
+## GitHub Codespaces 快速开始
 
-As an alternative to building on your local machine, there is a new option to get a development environment up and running in less than 5 minutes by using GitHub Codespaces. Please note that there is a [Limited Free Monthly Quota](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces), and after that GitHub will start charging you.
+作为在本地构建的替代方案，现在有一个新选项，可以通过 GitHub Codespaces 在不到 5 分钟内启动开发环境。请注意有[每月免费额度限制](https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces)，超出后 GitHub 会开始收费。
 
-_Note: You are billed for both time spent running, and for storage used_
+_注意：你将为运行时间和存储空间付费_
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/MetaMask/metamask-extension?quickstart=1)
+[![在 GitHub Codespaces 中打开](https://github.com/codespaces/badge.svg)](https://codespaces.new/MetaMask/metamask-extension?quickstart=1)
 
-1. Start by clicking the button above
-2. A new browser tab will open with a remote version of Visual Studio Code (this will take a few minutes to load)
-3. A "Simple Browser" will open inside the browser with noVNC -- click Connect
-   - Optional steps:
-     - Click the button at the upper-right of the Simple Browser tab to open the noVNC window in its own tab
-     - Open the noVNC sidebar on the left, click the gear icon, change the Scaling Mode to Remote Resizing
-4. Wait about 20 extra seconds on the first launch, for the scripts to finish
-5. Right-click on the noVNC desktop to launch Chrome or Firefox with MetaMask pre-installed
-6. Change some code, then run `yarn start` to build in dev mode
-7. After a minute or two, it will finish building, and you can see your changes in the noVNC desktop
+1. 首先点击上方按钮
+2. 会打开一个新的浏览器标签页，加载远程版 Visual Studio Code（加载需要几分钟）
+3. “Simple Browser” 会在浏览器内打开 noVNC —— 点击 Connect
+   - 可选步骤：
+     - 点击 Simple Browser 标签页右上角的按钮，将 noVNC 窗口单独打开
+     - 打开 noVNC 左侧边栏，点击齿轮图标，将 Scaling Mode 改为 Remote Resizing
+4. 首次启动时多等约 20 秒，等待脚本执行完毕
+5. 右键 noVNC 桌面，启动已预装 MetaMask 的 Chrome 或 Firefox
+6. 修改代码后，运行 `yarn start` 以开发模式构建
+7. 一两分钟后构建完成，你可以在 noVNC 桌面查看更改效果
 
-### Tips to keep your Codespaces usage lower
+### 降低 Codespaces 使用量的小贴士
 
-- You are billed for both time spent running, and for storage used
-- Codespaces pause after 30 minutes of inactivity, and auto-delete after 30 days of inactivity
-- You can manage your Codespaces here: https://github.com/codespaces
-  - You may want to manually pause them before the 30 minute timeout
-  - If you have several idle Codespaces hanging around for several days, you can quickly run out of storage quota. You should delete the ones you do not plan to use anymore, and probably keep only 1 or 2 in the long-term. It's also possible to re-use old Codespaces and switch the branch, instead of creating new ones and deleting the old ones.
+- 你将为运行时间和存储空间付费
+- Codespaces 在 30 分钟无操作后会暂停，30 天无操作后会自动删除
+- 你可以在此管理你的 Codespaces：https://github.com/codespaces
+  - 可以在 30 分钟超时前手动暂停
+  - 如果有多个闲置的 Codespaces 挂了好几天，很快就会用完存储额度。请删除不再使用的 Codespaces，长期建议只保留 1~2 个。你也可以复用旧 Codespaces 并切换分支，而不是每次新建和删除。
 
-### Codespaces on a fork
+### 在 Fork 上使用 Codespaces
 
-If you are not a MetaMask Internal Developer, or are otherwise developing on a fork, the default Infura key will be on the Free Plan and have very limited requests per second. If you want to use your own Infura key, follow the `.metamaskrc` and `INFURA_PROJECT_ID` instructions in the section [Building on your local machine](#building-on-your-local-machine).
+如果你不是 MetaMask 内部开发者，或在 fork 上开发，默认的 Infura key 属于免费计划，请求速率非常有限。如果你想用自己的 Infura key，请参考[本地构建](#building-on-your-local-machine)章节中的 `.metamaskrc` 和 `INFURA_PROJECT_ID` 说明。
 
-## Building on your local machine
+## 本地构建
 
-- Install [Node.js](https://nodejs.org) version 20
-  - If you are using [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) (recommended) running `nvm use` will automatically choose the right node version for you.
-- Enable Corepack by executing the command `corepack enable` within the metamask-extension project. Corepack is a utility included with Node.js by default. It manages Yarn on a per-project basis, using the version specified by the `packageManager` property in the project's package.json file. Please note that modern releases of [Yarn](https://yarnpkg.com/getting-started/install) are not intended to be installed globally or via npm.
-- Duplicate `.metamaskrc.dist` within the root and rename it to `.metamaskrc` by running `cp .metamaskrc{.dist,}`.
+- 安装 [Node.js](https://nodejs.org) 20 版本
 
-  - Replace the `INFURA_PROJECT_ID` value with your own personal [Infura API Key](https://docs.infura.io/networks/ethereum/how-to/secure-a-project/project-id).
-    - If you don't have an Infura account, you can create one for free on the [Infura website](https://app.infura.io/register).
-  - If debugging MetaMetrics, you'll need to add a value for `SEGMENT_WRITE_KEY` [Segment write key](https://segment.com/docs/connections/find-writekey/), see [Developing on MetaMask - Segment](./development/README.md#segment).
-  - If debugging unhandled exceptions, you'll need to add a value for `SENTRY_DSN` [Sentry Dsn](https://docs.sentry.io/product/sentry-basics/dsn-explainer/), see [Developing on MetaMask - Sentry](./development/README.md#sentry).
-  - Optionally, replace the `PASSWORD` value with your development wallet password to avoid entering it each time you open the app.
-  - If developing with remote feature flags, and you want to override the flags in the build process, you can add a `.manifest-overrides.json` file to the root of the project and set `MANIFEST_OVERRIDES=.manifest-overrides.json` in `.metamaskrc` to the path of the file.
-    This file is used to add flags to `manifest.json` build files for the extension. You can also modify the `_flags.remoteFeatureFlags` in the built version of `manifest.json` in the `dist/browser` folder to tweak the flags after the build process (these changes will get overwritten when you build again).
-    An example of this remote feature flag overwrite could be:
+  - 如果你使用 [nvm](https://github.com/nvm-sh/nvm#installing-and-updating)（推荐），运行 `nvm use` 会自动选择正确的 node 版本。
+
+- 在 metamask-extension 项目目录下执行 `corepack enable` 启用 Corepack。Corepack 是 Node.js 默认包含的工具，用于按项目管理 Yarn，使用 `package.json` 中 `packageManager` 指定的版本。请注意，现代版本的 [Yarn](https://yarnpkg.com/getting-started/install) 不建议全局或通过 npm 安装。
+- 在根目录下复制 `.metamaskrc.dist` 并重命名为 `.metamaskrc`，可通过命令 `cp .metamaskrc{.dist,}` 完成。
+
+  - 将 `INFURA_PROJECT_ID` 替换为你自己的 [Infura API Key](https://docs.infura.io/networks/ethereum/how-to/secure-a-project/project-id)。
+    - 如果没有 Infura 账号，可以在 [Infura 官网](https://app.infura.io/register) 免费注册。
+  - 如果调试 MetaMetrics，需要为 `SEGMENT_WRITE_KEY` 添加值，详见 [MetaMask 开发 - Segment](./development/README.md#segment)。
+  - 如果调试未处理异常，需要为 `SENTRY_DSN` 添加值，详见 [MetaMask 开发 - Sentry](./development/README.md#sentry)。
+  - 可选：将 `PASSWORD` 替换为你的开发钱包密码，避免每次打开应用都要输入。
+  - 如果需要远程特性开关，并希望在构建过程中覆盖这些开关，可以在项目根目录添加 `.manifest-overrides.json` 文件，并在 `.metamaskrc` 中设置 `MANIFEST_OVERRIDES=.manifest-overrides.json`。该文件用于为扩展的 `manifest.json` 构建文件添加标志。你也可以在 `dist/browser` 目录下已构建的 `manifest.json` 文件中修改 `_flags.remoteFeatureFlags`，以便在构建后调整开关（但再次构建会覆盖这些更改）。
+    例如，远程特性开关覆盖的写法如下:
 
   ```json
   {
@@ -69,105 +70,105 @@ If you are not a MetaMask Internal Developer, or are otherwise developing on a f
   }
   ```
 
-- Run `yarn install` to install the dependencies.
-- Build the project to the `./dist/` folder with `yarn dist` (for Chromium-based browsers) or `yarn dist:mv2` (for Firefox)
+- 运行 `yarn install` 安装依赖。
+- 使用 `yarn dist`（适用于 Chromium 内核浏览器）或 `yarn dist:mv2`（适用于 Firefox）将项目构建到 `./dist/` 文件夹。
 
-  - Optionally, to create a development build you can instead run `yarn start` (for Chromium-based browsers) or `yarn start:mv2` (for Firefox)
-  - Uncompressed builds can be found in `/dist`, compressed builds can be found in `/builds` once they're built.
-  - See the [build system readme](./development/build/README.md) for build system usage information.
+  - 可选：如需创建开发构建，可以运行 `yarn start`（Chromium 内核浏览器）或 `yarn start:mv2`（Firefox）。
+  - 未压缩的构建产物在 `/dist`，压缩后的构建产物在 `/builds`（构建完成后生成）。
+  - 有关构建系统的使用信息，请参阅 [build system readme](./development/build/README.md)。
 
-- Follow these instructions to verify that your local build runs correctly:
-  - [How to add custom build to Chrome](./docs/add-to-chrome.md)
-  - [How to add custom build to Firefox](./docs/add-to-firefox.md)
+- 按照以下说明验证你的本地构建是否能正常运行：
+  - [如何将自定义构建添加到 Chrome](./docs/add-to-chrome.md)
+  - [如何将自定义构建添加到 Firefox](./docs/add-to-firefox.md)
 
-## Git Hooks
+## Git 钩子
 
-To get quick feedback from our shared code quality fitness functions before committing the code, you can install our git hooks with Husky.
+为了在提交代码前快速获得我们共享的代码质量检测反馈，你可以使用 Husky 安装我们的 git 钩子。
 
 `$ yarn githooks:install`
 
-You can read more about them in our [testing documentation](./docs/testing.md#fitness-functions-measuring-progress-in-code-quality-and-preventing-regressions-using-custom-git-hooks).
+你可以在我们的[测试文档](./docs/testing.md#fitness-functions-measuring-progress-in-code-quality-and-preventing-regressions-using-custom-git-hooks)中了解更多相关内容。
 
-If you are using VS Code and are unable to make commits from the source control sidebar due to a "command not found" error, try these steps from the [Husky docs](https://typicode.github.io/husky/troubleshooting.html#command-not-found).
+如果你在 VS Code 中因 "command not found" 错误无法通过源代码管理侧边栏提交代码，请参考 [Husky 文档](https://typicode.github.io/husky/troubleshooting.html#command-not-found)中的解决方法。
 
-## Contributing
+## 贡献
 
-### Development builds
+### 开发构建
 
-To start a development build (e.g. with logging and file watching) run `yarn start`.
+要启动开发构建（如带日志和文件监听），运行 `yarn start`。
 
-#### Development build with wallet state
+#### 带钱包状态的开发构建
 
-You can start a development build with a preloaded wallet state, by adding `TEST_SRP='<insert SRP here>'` and `PASSWORD='<insert wallet password here>'` to the `.metamaskrc` file. Then you have the following options:
+你可以通过在 `.metamaskrc` 文件中添加 `TEST_SRP='<在此插入 SRP>'` 和 `PASSWORD='<在此插入钱包密码>'`，以预加载钱包状态启动开发构建。然后你有如下选项：
 
-1. Start the wallet with the default fixture flags, by running `yarn start:with-state`.
-2. Check the list of available fixture flags, by running `yarn start:with-state --help`.
-3. Start the wallet with custom fixture flags, by running `yarn start:with-state --FIXTURE_NAME=VALUE` for example `yarn start:with-state --withAccounts=100`. You can pass as many flags as you want. The rest of the fixtures will take the default values.
+1. 运行 `yarn start:with-state`，使用默认的 fixture 标志启动钱包。
+2. 运行 `yarn start:with-state --help`，查看可用的 fixture 标志列表。
+3. 运行 `yarn start:with-state --FIXTURE_NAME=VALUE`，例如 `yarn start:with-state --withAccounts=100`，用自定义 fixture 标志启动钱包。你可以传递任意多个标志，其余 fixture 会采用默认值。
 
-#### Development build with Webpack
+#### 使用 Webpack 的开发构建
 
-You can also start a development build using the `yarn webpack` command, or `yarn webpack --watch`. This uses an alternative build system that is much faster, but not yet production ready. See the [Webpack README](./development/webpack/README.md) for more information.
+你也可以通过 `yarn webpack` 或 `yarn webpack --watch` 启动开发构建。这会使用一个更快但尚未生产可用的替代构建系统。更多信息见 [Webpack README](./development/webpack/README.md)。
 
-#### React and Redux DevTools
+#### React 和 Redux DevTools
 
-To start the [React DevTools](https://github.com/facebook/react-devtools), run `yarn devtools:react` with a development build installed in a browser. This will open in a separate window; no browser extension is required.
+要启动 [React DevTools](https://github.com/facebook/react-devtools)，在浏览器中安装了开发构建后运行 `yarn devtools:react`。这会在单独窗口打开，无需浏览器扩展。
 
-To start the [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools/tree/main/extension):
+要启动 [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools/tree/main/extension)：
 
-- Install the package `remotedev-server` globally (e.g. `yarn global add remotedev-server`)
-- Install the Redux Devtools extension.
-- Open the Redux DevTools extension and check the "Use custom (local) server" checkbox in the Remote DevTools Settings, using the default server configuration (host `localhost`, port `8000`, secure connection checkbox unchecked).
+- 全局安装 `remotedev-server` 包（如 `yarn global add remotedev-server`）
+- 安装 Redux Devtools 扩展
+- 打开 Redux DevTools 扩展，在 Remote DevTools 设置中勾选 "Use custom (local) server"，使用默认服务器配置（主机 `localhost`，端口 `8000`，不勾选安全连接）
 
-Then run the command `yarn devtools:redux` with a development build installed in a browser. This will enable you to use the Redux DevTools extension to inspect MetaMask.
+然后在浏览器中安装了开发构建后运行 `yarn devtools:redux`，即可用 Redux DevTools 扩展检查 MetaMask。
 
-To create a development build and run both of these tools simultaneously, run `yarn start:dev`.
+要同时创建开发构建并运行这两个工具，运行 `yarn start:dev`。
 
-#### Test Dapp
+#### 测试 Dapp
 
-[This test site](https://metamask.github.io/test-dapp/) can be used to execute different user flows.
+[这个测试站点](https://metamask.github.io/test-dapp/) 可用于执行不同的用户流程。
 
-### Running Unit Tests and Linting
+### 运行单元测试和代码检查
 
-Run unit tests and the linter with `yarn test`. To run just unit tests, run `yarn test:unit`.
+运行 `yarn test` 可同时执行单元测试和代码检查。仅运行单元测试可用 `yarn test:unit`。
 
-You can run the linter by itself with `yarn lint`, and you can automatically fix some lint problems with `yarn lint:fix`. You can also run these two commands just on your local changes to save time with `yarn lint:changed` and `yarn lint:changed:fix` respectively.
+你可以单独运行代码检查 `yarn lint`，也可以用 `yarn lint:fix` 自动修复部分问题。还可以用 `yarn lint:changed` 和 `yarn lint:changed:fix` 仅对本地更改的文件执行上述操作，以节省时间。
 
-For Jest debugging guide using Node.js, see [docs/tests/jest.md](docs/tests/jest.md).
+Node.js 下的 Jest 调试指南见 [docs/tests/jest.md](docs/tests/jest.md)。
 
-### Running E2E Tests
+### 运行 E2E 测试
 
-Our e2e test suite can be run on either Firefox or Chrome. Here's how to get started with e2e testing:
+我们的 e2e 测试套件可在 Firefox 或 Chrome 上运行。以下是 e2e 测试的入门方法：
 
-#### Preparing a Test Build
+#### 准备测试构建
 
-Before running e2e tests, ensure you've run `yarn install` to download dependencies. Next, you'll need a test build. You have 3 options:
+在运行 e2e 测试前，确保已运行 `yarn install` 下载依赖。接下来你需要一个测试构建，有三种方式：
 
-1. Use `yarn download-builds:test` to quickly download and unzip test builds for Chrome and Firefox into the `./dist/` folder. This method is fast and convenient for standard testing.
-2. Create a custom test build: for testing against different build types, use `yarn build:test`. This command allows you to generate test builds for various types, including:
-   - `yarn build:test` for main build
-   - `yarn build:test:flask` for flask build
-   - `yarn build:test:mv2` for mv2 build
-   - `yarn build:test:mmi` for mmi build
-3. Start a test build with live changes: `yarn start:test` is particularly useful for development. It starts a test build that automatically recompiles application code upon changes. This option is ideal for iterative testing and development. This command also allows you to generate test builds for various types, including:
-   - `yarn start:test` for main build
-   - `yarn start:test:flask` for flask build
-   - `yarn start:test:mv2` for mv2 build
+1. 使用 `yarn download-builds:test`，快速下载并解压 Chrome 和 Firefox 的测试构建到 `./dist/` 文件夹。此方法快捷方便，适合标准测试。
+2. 创建自定义测试构建：如需针对不同构建类型测试，使用 `yarn build:test`。该命令可生成多种类型的测试构建，包括：
+   - `yarn build:test` 主构建
+   - `yarn build:test:flask` flask 构建
+   - `yarn build:test:mv2` mv2 构建
+   - `yarn build:test:mmi` mmi 构建
+3. 启动带实时变更的测试构建：`yarn start:test` 特别适合开发。它会启动一个测试构建，应用代码变更后会自动重新编译。此选项非常适合迭代测试和开发。该命令同样支持多种类型的测试构建，包括：
+   - `yarn start:test` 主构建
+   - `yarn start:test:flask` flask 构建
+   - `yarn start:test:mv2` mv2 构建
 
-Note: The `yarn start:test` command (which initiates the testDev build type) has LavaMoat disabled for both the build system and the application, offering a streamlined testing experience during development. On the other hand, `yarn build:test` enables LavaMoat for enhanced security in both the build system and application, mirroring production environments more closely.
+注意：`yarn start:test` 命令（即 testDev 构建类型）会在构建系统和应用中禁用 LavaMoat，便于开发时流畅测试。而 `yarn build:test` 则会在构建系统和应用中启用 LavaMoat，更接近生产环境的安全性。
 
-#### Running Tests
+#### 运行测试
 
-Once you have your test build ready, choose the browser for your e2e tests:
+当你准备好测试构建后，选择用于 e2e 测试的浏览器：
 
-- For Firefox, run `yarn test:e2e:firefox`.
-  - Note: If you are running Firefox as a snap package on Linux, ensure you enable the appropriate environment variable: `FIREFOX_SNAP=true yarn test:e2e:firefox`
-- For Chrome, run `yarn test:e2e:chrome`.
+- Firefox：运行 `yarn test:e2e:firefox`
+  - 注意：如果你在 Linux 上以 snap 包方式运行 Firefox，请确保设置了环境变量：`FIREFOX_SNAP=true yarn test:e2e:firefox`
+- Chrome：运行 `yarn test:e2e:chrome`
 
-These scripts support additional options for debugging. Use `--help`to see all available options.
+这些脚本支持更多调试选项，使用 `--help` 查看所有可用选项。
 
-#### Running a single e2e test
+#### 运行单个 e2e 测试
 
-Single e2e tests can be run with `yarn test:e2e:single test/e2e/tests/TEST_NAME.spec.js` along with the options below.
+可以使用 `yarn test:e2e:single test/e2e/tests/TEST_NAME.spec.js` 命令结合下方参数运行单个 e2e 测试。
 
 ```console
   --browser           Set the browser to be used; specify 'chrome', 'firefox', 'all'
@@ -184,82 +185,281 @@ Single e2e tests can be run with `yarn test:e2e:single test/e2e/tests/TEST_NAME.
                                              [alias: -u] [boolean] [default: false]
 ```
 
-For example, to run the `account-details` tests using Chrome, with debug logging and with the browser set to remain open upon failure, you would use:
+例如，要在 Chrome 上运行 `account-details` 测试，并启用调试日志且在失败时保持浏览器窗口不关闭，可以使用如下命令：
 `yarn test:e2e:single test/e2e/tests/account-menu/account-details.spec.js --browser=chrome --leave-running`
 
-#### Running e2e tests against specific feature flag
+#### 针对特性开关运行 e2e 测试
 
-While developing new features, we often use feature flags. As we prepare to make these features generally available (GA), we remove the feature flags. Existing feature flags are listed in the `.metamaskrc.dist` file. To execute e2e tests with a particular feature flag enabled, it's necessary to first generate a test build with that feature flag activated. There are two ways to achieve this:
+在开发新功能时，我们经常会用到特性开关。当准备将这些功能正式发布（GA）时，我们会移除特性开关。现有的特性开关可以在 `.metamaskrc.dist` 文件中找到。要在启用某个特性开关的情况下运行 e2e 测试，首先需要生成一个启用了该特性开关的测试构建。有两种方式：
 
-- To enable a feature flag in your local configuration, you should first ensure you have a `.metamaskrc` file copied from `.metamaskrc.dist`. Then, within your local `.metamaskrc` file, you can set the desired feature flag to true. Following this, a test build with the feature flag enabled can be created by executing `yarn build:test`.
+- 在本地配置中启用特性开关：首先确保你已经将 `.metamaskrc.dist` 复制为 `.metamaskrc`。然后在本地 `.metamaskrc` 文件中将所需的特性开关设置为 true。之后，执行 `yarn build:test` 即可生成带有该特性开关的测试构建。
 
-- Alternatively, for enabling a feature flag directly during the test build creation, you can pass the parameter as true via the command line. For instance, activating the MULTICHAIN feature flag can be done by running `MULTICHAIN=1 yarn build:test` or `MULTICHAIN=1 yarn start:test` . This method allows for quick adjustments to feature flags without altering the `.metamaskrc` file.
+- 或者，也可以在创建测试构建时直接通过命令行参数启用特性开关。例如，启用 MULTICHAIN 特性开关可以运行 `MULTICHAIN=1 yarn build:test` 或 `MULTICHAIN=1 yarn start:test`。这种方式可以快速调整特性开关，无需修改 `.metamaskrc` 文件。
 
-Once you've created a test build with the desired feature flag enabled, proceed to run your tests as usual. Your tests will now run against the version of the extension with the specific feature flag activated. For example:
+当你生成了带有目标特性开关的测试构建后，像平常一样运行测试即可。此时你的测试会基于已启用该特性开关的扩展版本。例如：
 `yarn test:e2e:single test/e2e/tests/account-menu/account-details.spec.js --browser=chrome`
 
-This approach ensures that your e2e tests accurately reflect the user experience for the upcoming GA features.
+这种方式可以确保你的 e2e 测试准确反映即将 GA 的新功能的用户体验。
 
-#### Running specific builds types e2e test
+#### 针对不同构建类型运行 e2e 测试
 
-Different build types have different e2e tests sets. In order to run them look in the `package.json` file. You will find:
+不同的构建类型有各自对应的 e2e 测试集。要运行这些测试，请在 `package.json` 文件中查找相关命令。例如：
 
 ```console
     "test:e2e:chrome:snaps": "SELENIUM_BROWSER=chrome node test/e2e/run-all.js --snaps",
     "test:e2e:firefox": "SELENIUM_BROWSER=firefox node test/e2e/run-all.js",
 ```
 
-### Changing dependencies
+### 依赖变更
 
-Whenever you change dependencies (adding, removing, or updating, either in `package.json` or `yarn.lock`), there are various files that must be kept up-to-date.
+每当你更改依赖（无论是添加、删除还是更新 `package.json` 或 `yarn.lock`），都需要同步维护多个文件：
 
-- `yarn.lock`:
-  - Run `yarn` again after your changes to ensure `yarn.lock` has been properly updated.
-  - Run `yarn lint:lockfile:dedupe:fix` to remove duplicate dependencies from the lockfile.
-- The `allow-scripts` configuration in `package.json`
-  - Run `yarn allow-scripts auto` to update the `allow-scripts` configuration automatically. This config determines whether the package's install/postinstall scripts are allowed to run. Review each new package to determine whether the install script needs to run or not, testing if necessary.
-  - Unfortunately, `yarn allow-scripts auto` will behave inconsistently on different platforms. macOS and Windows users may see extraneous changes relating to optional dependencies.
-- The LavaMoat policy files
-  - If you are a MetaMask team member and your PR is on a repository branch, you can use the bot command `@metamaskbot update-policies` to ask the MetaMask bot to automatically update the policies for you.
-  - If your PR is from a fork, you can ask a MetaMask team member to help with updating the policy files.
-  - Manual update instructions: The _tl;dr_ is to run `yarn lavamoat:auto` to update these files, but there can be devils in the details:
-    - There are two sets of LavaMoat policy files:
-      - The production LavaMoat policy files (`lavamoat/browserify/*/policy.json`), which are re-generated using `yarn lavamoat:webapp:auto`. Add `--help` for usage.
-        - These should be regenerated whenever the production dependencies for the webapp change.
-      - The build system LavaMoat policy file (`lavamoat/build-system/policy.json`), which is re-generated using `yarn lavamoat:build:auto`.
-        - This should be regenerated whenever the dependencies used by the build system itself change.
-    - Whenever you regenerate a policy file, review the changes to determine whether the access granted to each package seems appropriate.
-    - Unfortunately, `yarn lavamoat:auto` will behave inconsistently on different platforms.
-      macOS and Windows users may see extraneous changes relating to optional dependencies.
-    - If you keep getting policy failures even after regenerating the policy files, try regenerating the policies after a clean install by doing:
+- `yarn.lock`：
+  - 依赖变更后再次运行 `yarn`，确保 `yarn.lock` 已正确更新。
+  - 运行 `yarn lint:lockfile:dedupe:fix`，去除 lockfile 中的重复依赖。
+- `package.json` 中的 `allow-scripts` 配置
+  - 运行 `yarn allow-scripts auto` 自动更新 `allow-scripts` 配置。该配置决定哪些包的 install/postinstall 脚本被允许执行。每次引入新包时请检查是否需要运行 install 脚本，并视情况测试。
+  - 注意：`yarn allow-scripts auto` 在不同平台上表现不一致。macOS 和 Windows 用户可能会看到与可选依赖相关的多余变更。
+- LavaMoat 策略文件
+  - 如果你是 MetaMask 团队成员且 PR 在仓库分支上，可以用机器人命令 `@metamaskbot update-policies` 让 MetaMask 机器人自动更新策略文件。
+  - 如果你的 PR 来自 fork，可以请团队成员协助更新策略文件。
+  - 手动更新方法：简而言之，运行 `yarn lavamoat:auto` 更新这些文件，但细节上需注意：
+    - LavaMoat 策略文件分为两套：
+      - 生产环境策略文件（`lavamoat/browserify/*/policy.json`），通过 `yarn lavamoat:webapp:auto` 重新生成。可加 `--help` 查看用法。
+        - 每当 webapp 的生产依赖变更时都应重新生成。
+      - 构建系统策略文件（`lavamoat/build-system/policy.json`），通过 `yarn lavamoat:build:auto` 重新生成。
+        - 每当构建系统自身依赖变更时都应重新生成。
+    - 每次重新生成策略文件后，请检查变更，确保每个包的访问权限合理。
+    - 注意：`yarn lavamoat:auto` 在不同平台上表现不一致。macOS 和 Windows 用户可能会看到与可选依赖相关的多余变更。
+    - 如果多次重新生成策略文件后仍遇到策略失败，建议先清理依赖再重试：
       - `rm -rf node_modules/ && yarn && yarn lavamoat:auto`
-    - Keep in mind that any kind of dynamic import or dynamic use of globals may elude LavaMoat's static analysis.
-      Refer to the LavaMoat documentation or ask for help if you run into any issues.
-- The Attributions file
-  - If you are a MetaMask team member and your PR is on a repository branch, you can use the bot command `@metamaskbot update-attributions` to ask the MetaMask bot to automatically update the attributions file for you.
-  - Manual update: run `yarn attributions:generate`.
+    - 注意，任何动态 import 或全局变量的动态用法都可能绕过 LavaMoat 的静态分析。遇到问题请查阅 LavaMoat 文档或寻求帮助。
+- 归属文件（Attributions file）
+  - 如果你是 MetaMask 团队成员且 PR 在仓库分支上，可以用机器人命令 `@metamaskbot update-attributions` 让 MetaMask 机器人自动更新归属文件。
+  - 手动更新：运行 `yarn attributions:generate`。
 
-## Architecture
+## 架构
 
-- [Visual of the controller hierarchy and dependencies as of summer 2022.](https://gist.github.com/rekmarks/8dba6306695dcd44967cce4b6a94ae33)
-- [Visual of the entire codebase.](https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=metamask%2Fmetamask-extension)
+- [2022 年夏季控制器层级与依赖关系可视化](https://gist.github.com/rekmarks/8dba6306695dcd44967cce4b6a94ae33)
+- [整个代码库的可视化](https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=metamask%2Fmetamask-extension)
 
-[![Architecture Diagram](./docs/architecture.png)][1]
+[![架构图](./docs/architecture.png)][1]
 
-## Other Docs
+## 其他文档
 
-- [How to add a new translation to MetaMask](./docs/translating-guide.md)
-- [Publishing Guide](./docs/publishing.md)
-- [How to use the TREZOR emulator](./docs/trezor-emulator.md)
-- [Developing on MetaMask](./development/README.md)
-- [How to generate a visualization of this repository's development](./development/gource-viz.sh)
-- [How to add new confirmations](./docs/confirmations.md)
-- [Browser support guidelines](./docs/browser-support.md)
+- [如何为 MetaMask 添加新翻译](./docs/translating-guide.md)
+- [发布指南](./docs/publishing.md)
+- [如何使用 TREZOR 模拟器](./docs/trezor-emulator.md)
+- [MetaMask 开发文档](./development/README.md)
+- [如何生成本仓库开发过程的可视化图](./development/gource-viz.sh)
+- [如何添加新确认](./docs/confirmations.md)
+- [浏览器支持指南](./docs/browser-support.md)
 
-## Dapp Developer Resources
+## Dapp 开发者资源
 
-- [Extend MetaMask's features w/ MetaMask Snaps.](https://docs.metamask.io/snaps/)
-- [Prompt your users to add and switch to a new network.](https://docs.metamask.io/wallet/how-to/add-network/)
-- [Change the logo that appears when your dapp connects to MetaMask.](https://docs.metamask.io/wallet/how-to/display/icon/)
+- [用 MetaMask Snaps 扩展 MetaMask 功能](https://docs.metamask.io/snaps/)
+- [提示用户添加并切换到新网络](https://docs.metamask.io/wallet/how-to/add-network/)
+- [更改你的 dapp 连接 MetaMask 时显示的图标](https://docs.metamask.io/wallet/how-to/display/icon/)
+
+[1]: http://www.nomnoml.com/#view/%5B%3Cactor%3Euser%5D%0A%0A%5Bmetamask-ui%7C%0A%20%20%20%5Btools%7C%0A%20%20%20%20%20react%0A%20%20%20%20%20redux%0A%20%20%20%20%20thunk%0A%20%20%20%20%20ethUtils%0A%20%20%20%20%20jazzicon%0A%20%20%20%5D%0A%20%20%20%5Bcomponents%7C%0A%20%20%20%20%20app%0A%20%20%20%20%20account-detail%0A%20%20%20%20%20accounts%0A%20%20%20%20%20locked-screen%0A%20%20%20%20%20restore-vault%0A%20%20%20%20%20identicon%0A%20%20%20%20%20config%0A%20%20%20%20%20info%0A%20%20%20%5D%0A%20%20%20%5Breducers%7C%0A%20%20%20%20%20app%0A%20%20%20%20%20metamask%0A%20%20%20%20%20identities%0A%20%20%20%5D%0A%20%20%20%5Bactions%7C%0A%20%20%20%20%20%5BbackgroundConnection%5D%0A%20%20%20%5D%0A%20%20%20%5Bcomponents%5D%3A-%3E%5Bactions%5D%0A%20%20%20%5Bactions%5D%3A-%3E%5Breducers%5D%0A%20%20%20%5Breducers%5D%3A-%3E%5Bcomponents%5D%0A%5D%0A%0A%5Bweb%20dapp%7C%0A%20%20%5Bui%20code%5D%0A%20%20%5Bweb3%5D%0A%20%20%5Bmetamask-inpage%5D%0A%20%20%0A%20%20%5B%3Cactor%3Eui%20developer%5D%0A%20%20%5Bui%20developer%5D-%3E%5Bui%20code%5D%0A%20%20%5Bui%20code%5D%3C-%3E%5Bweb3%5D%0A%20%20%5Bweb3%5D%3C-%3E%5Bmetamask-inpage%5D%0A%5D%0A%0A%5Bmetamask-background%7C%0A%20%20%5Bprovider-engine%5D%0A%20%20%5Bhooked%20wallet%20subprovider%5D%0A%20%20%5Bid%20store%5D%0A%20%20%0A%20%20%5Bprovider-engine%5D%3C-%3E%5Bhooked%20wallet%20subprovider%5D%0A%20%20%5Bhooked%20wallet%20subprovider%5D%3C-%3E%5Bid%20store%5D%0A%20%20%5Bconfig%20manager%7C%0A%20%20%20%20%5Brpc%20configuration%5D%0A%20%20%20%20%5Bencrypted%20keys%5D%0A%20%20%20%20%5Bwallet%20nicknames%5D%0A%20%20%5D%0A%20%20%0A%20%20%5Bprovider-engine%5D%3C-%5Bconfig%20manager%5D%0A%20%20%5Bid%20store%5D%3C-%3E%5Bconfig%20manager%5D%0A%5D%0A%0A%5Buser%5D%3C-%3E%5Bmetamask-ui%5D%0A%0A%5Buser%5D%3C%3A--%3A%3E%5Bweb%20dapp%5D%0A%0A%5Bmetamask-contentscript%7C%0A%20%20%5Bplugin%20restart%20detector%5D%0A%20%20%5Brpc%20passthrough%5D%0A%5D%0A%0A%5Brpc%20%7C%0A%20%20%5Bethereum%20blockchain%20%7C%0A%20%20%20%20%5Bcontracts%5D%0A%20%20%20%20%5Baccounts%5D%0A%20%20%5D%0A%5D%0A%0A%5Bweb%20dapp%5D%3C%3A--%3A%3E%5Bmetamask-contentscript%5D%0A%5Bmetamask-contentscript%5D%3C-%3E%5Bmetamask-background%5D%0A%5Bmetamask-background%5D%3C-%3E%5Bmetamask-ui%5D%0A%5Bmetamask-background%5D%3C-%3E%5Brpc%5D%0A
+
+```json
+{
+  "_flags": {
+    "remoteFeatureFlags": { "testBooleanFlag": false }
+  }
+}
+```
+
+- 运行 `yarn install` 安装依赖。
+- 使用 `yarn dist`（适用于 Chromium 内核浏览器）或 `yarn dist:mv2`（适用于 Firefox）将项目构建到 `./dist/` 文件夹。
+
+  - 可选：如需创建开发构建，可以运行 `yarn start`（Chromium 内核浏览器）或 `yarn start:mv2`（Firefox）。
+  - 未压缩的构建产物在 `/dist`，压缩后的构建产物在 `/builds`（构建完成后生成）。
+  - 有关构建系统的使用信息，请参阅 [build system readme](./development/build/README.md)。
+
+- 按照以下说明验证你的本地构建是否能正常运行：
+  - [如何将自定义构建添加到 Chrome](./docs/add-to-chrome.md)
+  - [如何将自定义构建添加到 Firefox](./docs/add-to-firefox.md)
+
+## Git 钩子
+
+为了在提交代码前快速获得我们共享的代码质量检测反馈，你可以使用 Husky 安装我们的 git 钩子。
+
+`$ yarn githooks:install`
+
+你可以在我们的[测试文档](./docs/testing.md#fitness-functions-measuring-progress-in-code-quality-and-preventing-regressions-using-custom-git-hooks)中了解更多相关内容。
+
+如果你在 VS Code 中因 "command not found" 错误无法通过源代码管理侧边栏提交代码，请参考 [Husky 文档](https://typicode.github.io/husky/troubleshooting.html#command-not-found)中的解决方法。
+
+## 贡献
+
+### 开发构建
+
+要启动开发构建（如带日志和文件监听），运行 `yarn start`。
+
+#### 带钱包状态的开发构建
+
+你可以通过在 `.metamaskrc` 文件中添加 `TEST_SRP='<在此插入 SRP>'` 和 `PASSWORD='<在此插入钱包密码>'`，以预加载钱包状态启动开发构建。然后你有如下选项：
+
+1. 运行 `yarn start:with-state`，使用默认的 fixture 标志启动钱包。
+2. 运行 `yarn start:with-state --help`，查看可用的 fixture 标志列表。
+3. 运行 `yarn start:with-state --FIXTURE_NAME=VALUE`，例如 `yarn start:with-state --withAccounts=100`，用自定义 fixture 标志启动钱包。你可以传递任意多个标志，其余 fixture 会采用默认值。
+
+#### 使用 Webpack 的开发构建
+
+你也可以通过 `yarn webpack` 或 `yarn webpack --watch` 启动开发构建。这会使用一个更快但尚未生产可用的替代构建系统。更多信息见 [Webpack README](./development/webpack/README.md)。
+
+#### React 和 Redux DevTools
+
+要启动 [React DevTools](https://github.com/facebook/react-devtools)，在浏览器中安装了开发构建后运行 `yarn devtools:react`。这会在单独窗口打开，无需浏览器扩展。
+
+要启动 [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools/tree/main/extension)：
+
+- 全局安装 `remotedev-server` 包（如 `yarn global add remotedev-server`）
+- 安装 Redux Devtools 扩展
+- 打开 Redux DevTools 扩展，在 Remote DevTools 设置中勾选 "Use custom (local) server"，使用默认服务器配置（主机 `localhost`，端口 `8000`，不勾选安全连接）
+
+然后在浏览器中安装了开发构建后运行 `yarn devtools:redux`，即可用 Redux DevTools 扩展检查 MetaMask。
+
+要同时创建开发构建并运行这两个工具，运行 `yarn start:dev`。
+
+#### 测试 Dapp
+
+[这个测试站点](https://metamask.github.io/test-dapp/) 可用于执行不同的用户流程。
+
+### 运行单元测试和代码检查
+
+运行 `yarn test` 可同时执行单元测试和代码检查。仅运行单元测试可用 `yarn test:unit`。
+
+你可以单独运行代码检查 `yarn lint`，也可以用 `yarn lint:fix` 自动修复部分问题。还可以用 `yarn lint:changed` 和 `yarn lint:changed:fix` 仅对本地更改的文件执行上述操作，以节省时间。
+
+Node.js 下的 Jest 调试指南见 [docs/tests/jest.md](docs/tests/jest.md)。
+
+### 运行 E2E 测试
+
+我们的 e2e 测试套件可在 Firefox 或 Chrome 上运行。以下是 e2e 测试的入门方法：
+
+#### 准备测试构建
+
+在运行 e2e 测试前，确保已运行 `yarn install` 下载依赖。接下来你需要一个测试构建，有三种方式：
+
+1. 使用 `yarn download-builds:test`，快速下载并解压 Chrome 和 Firefox 的测试构建到 `./dist/` 文件夹。此方法快捷方便，适合标准测试。
+2. 创建自定义测试构建：如需针对不同构建类型测试，使用 `yarn build:test`。该命令可生成多种类型的测试构建，包括：
+   - `yarn build:test` 主构建
+   - `yarn build:test:flask` flask 构建
+   - `yarn build:test:mv2` mv2 构建
+   - `yarn build:test:mmi` mmi 构建
+3. 启动带实时变更的测试构建：`yarn start:test` 特别适合开发。它会启动一个测试构建，应用代码变更后会自动重新编译。此选项非常适合迭代测试和开发。该命令同样支持多种类型的测试构建，包括：
+   - `yarn start:test` 主构建
+   - `yarn start:test:flask` flask 构建
+   - `yarn start:test:mv2` mv2 构建
+
+注意：`yarn start:test` 命令（即 testDev 构建类型）会在构建系统和应用中禁用 LavaMoat，便于开发时流畅测试。而 `yarn build:test` 则会在构建系统和应用中启用 LavaMoat，更接近生产环境的安全性。
+
+#### 运行测试
+
+当你准备好测试构建后，选择用于 e2e 测试的浏览器：
+
+- Firefox：运行 `yarn test:e2e:firefox`
+  - 注意：如果你在 Linux 上以 snap 包方式运行 Firefox，请确保设置了环境变量：`FIREFOX_SNAP=true yarn test:e2e:firefox`
+- Chrome：运行 `yarn test:e2e:chrome`
+
+这些脚本支持更多调试选项，使用 `--help` 查看所有可用选项。
+
+#### 运行单个 e2e 测试
+
+可以使用 `yarn test:e2e:single test/e2e/tests/TEST_NAME.spec.js` 命令结合下方参数运行单个 e2e 测试。
+
+```console
+  --browser           Set the browser to be used; specify 'chrome', 'firefox', 'all'
+                      or leave unset to run on 'all' by default.
+                                                          [string] [default: 'all']
+  --debug             Run tests in debug mode, logging each driver interaction
+                                                         [boolean] [default: true]
+  --retries           Set how many times the test should be retried upon failure.
+                                                              [number] [default: 0]
+  --leave-running     Leaves the browser running after a test fails, along with
+                      anything else that the test used (ganache, the test dapp,
+                      etc.)                              [boolean] [default: false]
+  --update-snapshot   Update E2E test snapshots
+                                             [alias: -u] [boolean] [default: false]
+```
+
+例如，要在 Chrome 上运行 `account-details` 测试，并启用调试日志且在失败时保持浏览器窗口不关闭，可以使用如下命令：
+`yarn test:e2e:single test/e2e/tests/account-menu/account-details.spec.js --browser=chrome --leave-running`
+
+#### 针对特性开关运行 e2e 测试
+
+在开发新功能时，我们经常会用到特性开关。当准备将这些功能正式发布（GA）时，我们会移除特性开关。现有的特性开关可以在 `.metamaskrc.dist` 文件中找到。要在启用某个特性开关的情况下运行 e2e 测试，首先需要生成一个启用了该特性开关的测试构建。有两种方式：
+
+- 在本地配置中启用特性开关：首先确保你已经将 `.metamaskrc.dist` 复制为 `.metamaskrc`。然后在本地 `.metamaskrc` 文件中将所需的特性开关设置为 true。之后，执行 `yarn build:test` 即可生成带有该特性开关的测试构建。
+
+- 或者，也可以在创建测试构建时直接通过命令行参数启用特性开关。例如，启用 MULTICHAIN 特性开关可以运行 `MULTICHAIN=1 yarn build:test` 或 `MULTICHAIN=1 yarn start:test`。这种方式可以快速调整特性开关，无需修改 `.metamaskrc` 文件。
+
+当你生成了带有目标特性开关的测试构建后，像平常一样运行测试即可。此时你的测试会基于已启用该特性开关的扩展版本。例如：
+`yarn test:e2e:single test/e2e/tests/account-menu/account-details.spec.js --browser=chrome`
+
+这种方式可以确保你的 e2e 测试准确反映即将 GA 的新功能的用户体验。
+
+#### 针对不同构建类型运行 e2e 测试
+
+不同的构建类型有各自对应的 e2e 测试集。要运行这些测试，请在 `package.json` 文件中查找相关命令。例如：
+
+```console
+    "test:e2e:chrome:snaps": "SELENIUM_BROWSER=chrome node test/e2e/run-all.js --snaps",
+    "test:e2e:firefox": "SELENIUM_BROWSER=firefox node test/e2e/run-all.js",
+```
+
+### 依赖变更
+
+每当你更改依赖（无论是添加、删除还是更新 `package.json` 或 `yarn.lock`），都需要同步维护多个文件：
+
+- `yarn.lock`：
+  - 依赖变更后再次运行 `yarn`，确保 `yarn.lock` 已正确更新。
+  - 运行 `yarn lint:lockfile:dedupe:fix`，去除 lockfile 中的重复依赖。
+- `package.json` 中的 `allow-scripts` 配置
+  - 运行 `yarn allow-scripts auto` 自动更新 `allow-scripts` 配置。该配置决定哪些包的 install/postinstall 脚本被允许执行。每次引入新包时请检查是否需要运行 install 脚本，并视情况测试。
+  - 注意：`yarn allow-scripts auto` 在不同平台上表现不一致。macOS 和 Windows 用户可能会看到与可选依赖相关的多余变更。
+- LavaMoat 策略文件
+  - 如果你是 MetaMask 团队成员且 PR 在仓库分支上，可以用机器人命令 `@metamaskbot update-policies` 让 MetaMask 机器人自动更新策略文件。
+  - 如果你的 PR 来自 fork，可以请团队成员协助更新策略文件。
+  - 手动更新方法：简而言之，运行 `yarn lavamoat:auto` 更新这些文件，但细节上需注意：
+    - LavaMoat 策略文件分为两套：
+      - 生产环境策略文件（`lavamoat/browserify/*/policy.json`），通过 `yarn lavamoat:webapp:auto` 重新生成。可加 `--help` 查看用法。
+        - 每当 webapp 的生产依赖变更时都应重新生成。
+      - 构建系统策略文件（`lavamoat/build-system/policy.json`），通过 `yarn lavamoat:build:auto` 重新生成。
+        - 每当构建系统自身依赖变更时都应重新生成。
+    - 每次重新生成策略文件后，请检查变更，确保每个包的访问权限合理。
+    - 注意：`yarn lavamoat:auto` 在不同平台上表现不一致。macOS 和 Windows 用户可能会看到与可选依赖相关的多余变更。
+    - 如果多次重新生成策略文件后仍遇到策略失败，建议先清理依赖再重试：
+      - `rm -rf node_modules/ && yarn && yarn lavamoat:auto`
+    - 注意，任何动态 import 或全局变量的动态用法都可能绕过 LavaMoat 的静态分析。遇到问题请查阅 LavaMoat 文档或寻求帮助。
+- 归属文件（Attributions file）
+  - 如果你是 MetaMask 团队成员且 PR 在仓库分支上，可以用机器人命令 `@metamaskbot update-attributions` 让 MetaMask 机器人自动更新归属文件。
+  - 手动更新：运行 `yarn attributions:generate`。
+
+## 架构
+
+- [2022 年夏季控制器层级与依赖关系可视化](https://gist.github.com/rekmarks/8dba6306695dcd44967cce4b6a94ae33)
+- [整个代码库的可视化](https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=metamask%2Fmetamask-extension)
+
+[![架构图](./docs/architecture.png)][1]
+
+## 其他文档
+
+- [如何为 MetaMask 添加新翻译](./docs/translating-guide.md)
+- [发布指南](./docs/publishing.md)
+- [如何使用 TREZOR 模拟器](./docs/trezor-emulator.md)
+- [MetaMask 开发文档](./development/README.md)
+- [如何生成本仓库开发过程的可视化图](./development/gource-viz.sh)
+- [如何添加新确认](./docs/confirmations.md)
+- [浏览器支持指南](./docs/browser-support.md)
+
+## Dapp 开发者资源
+
+- [用 MetaMask Snaps 扩展 MetaMask 功能](https://docs.metamask.io/snaps/)
+- [提示用户添加并切换到新网络](https://docs.metamask.io/wallet/how-to/add-network/)
+- [更改你的 dapp 连接 MetaMask 时显示的图标](https://docs.metamask.io/wallet/how-to/display/icon/)
 
 [1]: http://www.nomnoml.com/#view/%5B%3Cactor%3Euser%5D%0A%0A%5Bmetamask-ui%7C%0A%20%20%20%5Btools%7C%0A%20%20%20%20%20react%0A%20%20%20%20%20redux%0A%20%20%20%20%20thunk%0A%20%20%20%20%20ethUtils%0A%20%20%20%20%20jazzicon%0A%20%20%20%5D%0A%20%20%20%5Bcomponents%7C%0A%20%20%20%20%20app%0A%20%20%20%20%20account-detail%0A%20%20%20%20%20accounts%0A%20%20%20%20%20locked-screen%0A%20%20%20%20%20restore-vault%0A%20%20%20%20%20identicon%0A%20%20%20%20%20config%0A%20%20%20%20%20info%0A%20%20%20%5D%0A%20%20%20%5Breducers%7C%0A%20%20%20%20%20app%0A%20%20%20%20%20metamask%0A%20%20%20%20%20identities%0A%20%20%20%5D%0A%20%20%20%5Bactions%7C%0A%20%20%20%20%20%5BbackgroundConnection%5D%0A%20%20%20%5D%0A%20%20%20%5Bcomponents%5D%3A-%3E%5Bactions%5D%0A%20%20%20%5Bactions%5D%3A-%3E%5Breducers%5D%0A%20%20%20%5Breducers%5D%3A-%3E%5Bcomponents%5D%0A%5D%0A%0A%5Bweb%20dapp%7C%0A%20%20%5Bui%20code%5D%0A%20%20%5Bweb3%5D%0A%20%20%5Bmetamask-inpage%5D%0A%20%20%0A%20%20%5B%3Cactor%3Eui%20developer%5D%0A%20%20%5Bui%20developer%5D-%3E%5Bui%20code%5D%0A%20%20%5Bui%20code%5D%3C-%3E%5Bweb3%5D%0A%20%20%5Bweb3%5D%3C-%3E%5Bmetamask-inpage%5D%0A%5D%0A%0A%5Bmetamask-background%7C%0A%20%20%5Bprovider-engine%5D%0A%20%20%5Bhooked%20wallet%20subprovider%5D%0A%20%20%5Bid%20store%5D%0A%20%20%0A%20%20%5Bprovider-engine%5D%3C-%3E%5Bhooked%20wallet%20subprovider%5D%0A%20%20%5Bhooked%20wallet%20subprovider%5D%3C-%3E%5Bid%20store%5D%0A%20%20%5Bconfig%20manager%7C%0A%20%20%20%20%5Brpc%20configuration%5D%0A%20%20%20%20%5Bencrypted%20keys%5D%0A%20%20%20%20%5Bwallet%20nicknames%5D%0A%20%20%5D%0A%20%20%0A%20%20%5Bprovider-engine%5D%3C-%5Bconfig%20manager%5D%0A%20%20%5Bid%20store%5D%3C-%3E%5Bconfig%20manager%5D%0A%5D%0A%0A%5Buser%5D%3C-%3E%5Bmetamask-ui%5D%0A%0A%5Buser%5D%3C%3A--%3A%3E%5Bweb%20dapp%5D%0A%0A%5Bmetamask-contentscript%7C%0A%20%20%5Bplugin%20restart%20detector%5D%0A%20%20%5Brpc%20passthrough%5D%0A%5D%0A%0A%5Brpc%20%7C%0A%20%20%5Bethereum%20blockchain%20%7C%0A%20%20%20%20%5Bcontracts%5D%0A%20%20%20%20%5Baccounts%5D%0A%20%20%5D%0A%5D%0A%0A%5Bweb%20dapp%5D%3C%3A--%3A%3E%5Bmetamask-contentscript%5D%0A%5Bmetamask-contentscript%5D%3C-%3E%5Bmetamask-background%5D%0A%5Bmetamask-background%5D%3C-%3E%5Bmetamask-ui%5D%0A%5Bmetamask-background%5D%3C-%3E%5Brpc%5D%0A
