@@ -188,9 +188,8 @@ const {
 } = deferredPromise();
 
 /**
- * Sends a message to the dapp(s) content script to signal it can connect to MetaMask background as
- * the backend is not active. It is required to re-connect dapps after service worker re-activates.
- * For non-dapp pages, the message will be sent and ignored.
+ * 向所有标签页发送消息，通知内容脚本可以连接后台。
+ * 主要用于 service worker 恢复后，重新连接 dapp。
  */
 const sendReadyMessageToTabs = async () => {
   const tabs = await browser.tabs
@@ -237,15 +236,13 @@ const sendReadyMessageToTabs = async () => {
 };
 
 /**
- * Detects known phishing pages as soon as the browser begins to load the
- * page. If the page is a known phishing page, the user is redirected to the
- * phishing warning page.
+ * 启动钓鱼检测功能。
+ * 注册 webRequest 拦截器，检测钓鱼页面并重定向到警告页。
+ * 兼容 MV2/MV3，不同平台采用不同拦截方式。
  *
- * This detection works even if the phishing page is now a redirect to a new
- * domain that our phishing detection system is not aware of.
- *
- * @param {MetamaskController} theController
+ * @param {MetamaskController} theController - 主控制器实例
  */
+
 function maybeDetectPhishing(theController) {
   async function redirectTab(tabId, url) {
     try {
@@ -456,6 +453,19 @@ function saveTimestamp() {
  *
  * @returns {Promise} Setup complete.
  */
+/**
+ * 初始化 MetaMask 控制器及相关平台配置。
+ * 1. 加载持久化状态
+ * 2. 获取用户首选语言
+ * 3. （测试环境）启动 mocha socket
+ * 4. （MV3）定时保存时间戳，保持 service worker 存活
+ * 5. 加载预装 Snaps
+ * 6. 调用 setupController 完成控制器初始化
+ * 7. 启动钓鱼检测
+ * 8. （MV2）预加载钓鱼警告页
+ * 9. 通知所有标签页后台已准备好
+ * 10. 标记初始化完成
+ */
 async function initialize() {
   try {
     const offscreenPromise = isManifestV3 ? createOffscreen() : null;
@@ -471,6 +481,7 @@ async function initialize() {
     // `navigator.webdriver` is true if Selenium, Puppeteer, or Playwright are running.
     // In MV3, the Service Worker sees `navigator.webdriver` as `undefined`, so this will trigger from
     // an Offscreen Document message instead. Because it's a singleton class, it's safe to start multiple times.
+    // 测试环境下启动 mocha socket
     if (process.env.IN_TEST && window.navigator?.webdriver) {
       getSocketBackgroundToMocha();
     }
@@ -478,6 +489,7 @@ async function initialize() {
     if (isManifestV3) {
       // Save the timestamp immediately and then every `SAVE_TIMESTAMP_INTERVAL`
       // miliseconds. This keeps the service worker alive.
+      // MV3 下定时保存时间戳，保持 service worker 存活
       if (initState.PreferencesController?.enableMV3TimestampSave !== false) {
         const SAVE_TIMESTAMP_INTERVAL_MS = 2 * 1000;
 
@@ -554,8 +566,8 @@ class PhishingWarningPageTimeoutError extends Error {
 }
 
 /**
- * Load the phishing warning page temporarily to ensure the service
- * worker has been registered, so that the warning page works offline.
+ * 预加载钓鱼警告页，确保 service worker 已注册，警告页可离线工作。
+ * 通过创建 iframe 加载警告页，超时后自动清理。
  */
 async function loadPhishingWarningPage() {
   let iframe;
@@ -617,6 +629,14 @@ async function loadPhishingWarningPage() {
  * Migrates that data schema in case it was last loaded on an older version.
  *
  * @returns {Promise<MetaMaskState>} Last data emitted from previous instance of MetaMask.
+ */
+
+/**
+ * 加载持久化存储的状态数据，并进行版本迁移。
+ * 如果启用 WITH_STATE，会合并测试用例生成的状态。
+ * 迁移后将元数据写入持久化管理器，并返回迁移后的数据。
+ *
+ * @returns {Promise<MetaMaskState>} 返回迁移后的状态数据
  */
 export async function loadStateFromPersistence() {
   // migrations
@@ -786,18 +806,17 @@ function trackAppOpened(environment) {
 }
 
 /**
- * Initializes the MetaMask Controller with any initial state and default language.
- * Configures platform-specific error reporting strategy.
- * Streams emitted state updates to platform-specific storage strategy.
- * Creates platform listeners for new Dapps/Contexts, and sets up their data connections to the controller.
+ * 初始化 MetaMask 控制器，配置平台相关参数、通知、持久化、事件订阅等。
+ * 负责设置与 UI、内容脚本、外部扩展的通信通道。
+ * 负责徽章（badge）更新、通知管理、特性开关等。
  *
- * @param {object} initState - The initial state to start the controller with, matches the state that is emitted from the controller.
- * @param {string} initLangCode - The region code for the language preferred by the current user.
- * @param {object} overrides - object with callbacks that are allowed to override the setup controller logic
- * @param isFirstMetaMaskControllerSetup
- * @param {object} stateMetadata - Metadata about the initial state and migrations, including the most recent migration version
- * @param {Promise<void>} offscreenPromise - A promise that resolves when the offscreen document has finished initialization.
- * @param {Array} preinstalledSnaps - A list of preinstalled Snaps loaded from disk during boot.
+ * @param {object} initState - 初始状态
+ * @param {string} initLangCode - 用户首选语言
+ * @param {object} overrides - 测试用覆盖项
+ * @param isFirstMetaMaskControllerSetup - 是否首次初始化
+ * @param {object} stateMetadata - 状态元数据
+ * @param {Promise<void>} offscreenPromise - MV3 下的 offscreen 初始化 promise
+ * @param {Array} preinstalledSnaps - 预装的 snaps
  */
 export function setupController(
   initState,
@@ -1354,11 +1373,18 @@ function setupSentryGetStateGlobal(store) {
   };
 }
 
+/**
+ * 初始化 MetaMask 后台主进程。
+ * 负责监听页面切换事件，并启动主初始化流程。
+ * 如果处于测试环境，初始化完成后会通知 offscreen 文档或设置页面标记。
+ * 初始化完成后会清理最近一次持久化的状态。
+ */
 async function initBackground() {
   onNavigateToTab();
   try {
     await initialize();
     if (process.env.IN_TEST) {
+      // 如果在测试环境，通知 offscreen 文档后台已准备好，或设置页面标记
       // Send message to offscreen document
       if (browser.offscreen) {
         browser.runtime.sendMessage({
@@ -1369,6 +1395,7 @@ async function initBackground() {
         window.document?.documentElement?.classList.add('controller-loaded');
       }
     }
+    // 清理最近一次持久化的状态，避免脏数据影响后续流程
     persistenceManager.cleanUpMostRecentRetrievedState();
   } catch (error) {
     log.error(error);
@@ -1377,3 +1404,11 @@ async function initBackground() {
 if (!process.env.SKIP_BACKGROUND_INITIALIZATION) {
   initBackground();
 }
+
+// initBackground()
+//   └─ initialize()
+//       ├─ loadStateFromPersistence()
+//       ├─ setupController(...)
+//       ├─ maybeDetectPhishing(controller)
+//       ├─ loadPhishingWarningPage()
+//       └─ sendReadyMessageToTabs()

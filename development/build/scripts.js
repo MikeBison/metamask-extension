@@ -1266,3 +1266,17 @@ function gracefulError(err) {
   console.warn(err);
   beep();
 }
+
+// 执行顺序
+// for each build target (dev, dist, prod, test, testDev):
+//     parallel:
+//         build standardEntryPoints (background, ui, content-script, offscreen)
+//         build contentscript (先 inpage, 再 contentscript)
+//         build disable-console
+//         build sentry-install
+//     if dev:
+//         启动 livereload 监听
+//     for each bundle group:
+//         生成对应 HTML 文件并注入脚本
+//     if MV3 and background group:
+//         生成 app-init.js

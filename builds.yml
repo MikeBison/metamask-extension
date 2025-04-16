@@ -1,17 +1,17 @@
-# TODO(ritave): Add support for environments (<root>/development/build/constants.js:@ENVIRONMENT)
-# TODO(ritave): Add support for build targets (<root>/development/build/constants.js:@BUILD_TARGETS)
-# TODO(ritave): Warn if not all of declared variables have been defined / used
+# TODO(ritave): 添加对环境的支持 (<root>/development/build/constants.js:@ENVIRONMENT)
+# TODO(ritave): 添加对构建目标的支持 (<root>/development/build/constants.js:@BUILD_TARGETS)
+# TODO(ritave): 警告如果并非所有声明的变量都已被定义/使用
 
-# The priority order of variable definitions (most important to least important):
-# <hardcoded build code>; <environmental variables>; .metamaskprodrc; .metamaskrc; builds.yml:.buildTypes.<type>.env; builds.yml:.features.<feature>.env; builds.yml:.env
+# 变量定义的优先级顺序（从最重要到最不重要）：
+# <硬编码构建代码>; <环境变量>; .metamaskprodrc; .metamaskrc; builds.yml:.buildTypes.<type>.env; builds.yml:.features.<feature>.env; builds.yml:.env
 
-# The build type to use when no build type provided in the cli
+# 当命令行中未提供构建类型时使用的默认构建类型
 default: &default main
 
-# Declaration of build types
-# Each build type is composed of features, env variables and assets.
-# Also known as productFlavors in Android lingo
-# Note: These build types should be kept in sync with the list in `.github/workflows/update-lavamoat-policies.yml`
+# 构建类型声明
+# 每种构建类型由特性、环境变量和资源组成
+# 类似于 Android 开发中的 productFlavors 概念
+# 注意：这些构建类型应与 `.github/workflows/update-lavamoat-policies.yml` 中的列表保持同步
 buildTypes:
   main:
     id: 10
@@ -19,7 +19,7 @@ buildTypes:
       - build-main
       - keyring-snaps
       - multi-srp
-    # Additional env variables that are specific to this build
+    # 特定于此构建的额外环境变量
     env:
       - INFURA_PROD_PROJECT_ID
       - SEGMENT_PROD_WRITE_KEY
@@ -31,10 +31,10 @@ buildTypes:
       - IFRAME_EXECUTION_ENVIRONMENT_URL: https://execution.metamask.io/iframe/7.2.0/index.html
       - ACCOUNT_SNAPS_DIRECTORY_URL: https://snaps.metamask.io/account-management
       - EVM_MULTICHAIN_ENABLED: false
-    # Main build uses the default browser manifest
+    # 主构建使用默认的浏览器清单
     manifestOverrides: false
-    # Build name used in multiple user-readable places
-    # eg. eip6963
+    # 在多个用户可读的地方使用的构建名称
+    # 例如 eip6963
     buildNameOverride: MetaMask
 
   beta:
@@ -60,17 +60,17 @@ buildTypes:
       - ACCOUNT_SNAPS_DIRECTORY_URL: https://snaps.metamask.io/account-management
       - EVM_MULTICHAIN_ENABLED: false
       - MULTICHAIN_API: true
-    # Modifies how the version is displayed.
-    # eg. instead of 10.25.0 -> 10.25.0-beta.2
+    # 修改版本的显示方式
+    # 例如，不是显示 10.25.0 而是显示 10.25.0-beta.2
     isPrerelease: true
-    # Folder which contains overrides to browser manifests
+    # 包含浏览器清单覆盖的文件夹
     manifestOverrides: ./app/build-types/beta/manifest/
     buildNameOverride: MetaMask Beta
 
   flask:
     id: 15
-    # Code surrounded using code fences for that feature
-    # will not be removed
+    # 使用该特性的代码围栏包围的代码
+    # 不会被移除
     features:
       - build-flask
       - keyring-snaps
@@ -117,28 +117,28 @@ buildTypes:
       - SUPPORT_REQUEST_LINK: https://support.metamask-institutional.io
       - SENTRY_DSN: SENTRY_MMI_DSN
       - EVM_MULTICHAIN_ENABLED: false
-    # For some reason, MMI uses this type of versioning
-    # Leaving it on for backwards compatibility
+    # 由于某种原因，MMI 使用这种版本控制方式
+    # 为了向后兼容保留此设置
     isPrerelease: true
     manifestOverrides: ./app/build-types/mmi/manifest/
     buildNameOverride: MetaMask Institutional
 
-# Build types are composed of a set of features.
-# Each feature can have code fences that add new code
-# as well declaring, defining and overriding env variables
+# 构建类型由一组特性组成
+# 每个特性可以有添加新代码的代码围栏
+# 以及声明、定义和覆盖环境变量
 features:
   ###
-  # Build Type code extensions. Things like different support links, warning pages, banners
+  # 构建类型代码扩展。例如不同的支持链接、警告页面、横幅等
   ###
 
   build-main:
   build-beta:
     assets:
-      # Assets that will be copied
+      # 将被复制的资源
       - src: ./app/build-types/beta/images/
         dest: images
-      # Assets that are exclusively included in this feature and ignored in others
-      # Supports globs
+      # 仅在此特性中包含并在其他特性中忽略的资源
+      # 支持通配符
       - ./{app,shared,ui}/**/beta/**
   build-mmi:
     assets:
@@ -173,15 +173,15 @@ features:
         dest: snaps/solana-wallet-snap.json
   multi-srp:
     assets:
-      # srp-list is a special case and is used in the srp recovery flow now.
+      # srp-list 是一个特殊情况，现在用于 srp 恢复流程
       - ./{app,shared,ui}/**/multi-srp/(?!.*srp-list)/**
   solana-swaps:
   multichain:
 
-# Env variables that are required for all types of builds
+# 所有类型构建都需要的环境变量
 #
-# env object supports both declarations (- FOO), and definitions (- FOO: BAR).
-# Variables that were declared have to be defined somewhere in the load chain before usage
+# env 对象支持声明 (- FOO) 和定义 (- FOO: BAR)
+# 被声明的变量必须在使用前在加载链中的某处被定义
 env:
   - ACCOUNTS_USE_DEV_APIS: false
   - BRIDGE_USE_DEV_APIS: false
@@ -189,29 +189,29 @@ env:
   - PORTFOLIO_URL: https://portfolio.metamask.io
   - TOKEN_ALLOWANCE_IMPROVEMENTS: false
   - TRANSACTION_SECURITY_PROVIDER: false
-  # The unlock password
+  # 解锁密码
   - PASSWORD: null
   - TEST_SRP: null
   - WITH_STATE: null
-  # Also see METAMASK_DEBUG and NODE_DEBUG
+  # 另见 METAMASK_DEBUG 和 NODE_DEBUG
   - DEBUG: null
   - SUPPORT_LINK: https://support.metamask.io
   - SUPPORT_REQUEST_LINK: https://support.metamask.io
   - SKIP_BACKGROUND_INITIALIZATION: false
   - PPOM_URI: ./ppom_bg.wasm
-  # CDN for blockaid files
+  # blockaid 文件的 CDN
   - BLOCKAID_FILE_CDN: static.cx.metamask.io/api/v1/confirmations/ppom
-  # Blockaid public key for verifying signatures of data files downloaded from CDN
+  # 用于验证从 CDN 下载的数据文件签名的 Blockaid 公钥
   - BLOCKAID_PUBLIC_KEY: 066ad3e8af5583385e312c156d238055215d5f25247c1e91055afa756cb98a88
   - REMOVE_GNS: ''
 
   - ENABLE_MV3: true
-  # These are exclusively used for MV3
+  # 这些仅用于 MV3（Manifest V3）
   - USE_SNOW
   - APPLY_LAVAMOAT
   - FILE_NAMES
 
-  # This variable is read by Trezor's source and breaks build if not included
+  # 这个变量由 Trezor 的源代码读取，如果不包含则会导致构建失败
   - ASSET_PREFIX: null
   - SUITE_TYPE: null
   - COMMITHASH: null
@@ -227,7 +227,7 @@ env:
   - INFURA_STORYBOOK_PROJECT_ID
 
   ###
-  # Notifications Feature
+  # 通知功能
   ###
   - AUTH_API: https://authentication.api.cx.metamask.io
   - OIDC_API: https://oidc.api.cx.metamask.io
@@ -250,132 +250,131 @@ env:
   - __FIREBASE_DEFAULTS__: null
 
   ###
-  # API keys to 3rd party services
+  # 第三方服务的 API 密钥
   ###
 
   - SEGMENT_HOST: null
   - SENTRY_DSN: null
   - SENTRY_DSN_DEV: null
-  # also INFURA_PROJECT_ID below
+  # 另见下面的 INFURA_PROJECT_ID
 
   ###
-  # Build system backwards compatibility
+  # 构建系统向后兼容性
   ###
 
   - INFURA_ENV_KEY_REF
   - SEGMENT_WRITE_KEY_REF
 
   ###
-  # Variables that are modified with hardcoded code
+  # 通过硬编码代码修改的变量
   ###
 
-  # URL of the decoding API used to provide additional data from signature requests
+  # 用于提供签名请求附加数据的解码 API 的 URL
   - DECODING_API_URL: 'https://signature-insights.api.cx.metamask.io/v1'
-  # Determines if feature flagged Settings Page - Developer Options should be used
+  # 确定是否应使用功能标记的设置页面 - 开发者选项
   - ENABLE_SETTINGS_PAGE_DEV_OPTIONS: false
-  # Used for debugging changes to the phishing warning page.
-  # Modified in <root>/development/build/scripts.js:@getPhishingWarningPageUrl
+  # 用于调试对钓鱼警告页面的更改
+  # 在 <root>/development/build/scripts.js:@getPhishingWarningPageUrl 中修改
   - PHISHING_WARNING_PAGE_URL: null
-  # Modified in <root>/development/build/scripts.js:@getInfuraProjectId
+  # 在 <root>/development/build/scripts.js:@getInfuraProjectId 中修改
   - INFURA_PROJECT_ID
-  # Modified in <root>/development/build/scripts.js:@getSegmentWriteKey
+  # 在 <root>/development/build/scripts.js:@getSegmentWriteKey 中修改
   - SEGMENT_WRITE_KEY: ''
-  # Modified in <root>/development/build/scripts.js:@getAnalyticsDataDeletionSourceId
+  # 在 <root>/development/build/scripts.js:@getAnalyticsDataDeletionSourceId 中修改
   - ANALYTICS_DATA_DELETION_SOURCE_ID: null
-  # Modified in <root>/development/build/scripts.js:@getAnalyticsDataDeletionEndpoint
+  # 在 <root>/development/build/scripts.js:@getAnalyticsDataDeletionEndpoint 中修改
   - ANALYTICS_DATA_DELETION_ENDPOINT: null
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
-  # Also see DEBUG and NODE_DEBUG
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
+  # 另见 DEBUG 和 NODE_DEBUG
   - METAMASK_DEBUG: false
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - IN_TEST
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_ENVIRONMENT
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_VERSION
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_BUILD_TYPE
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_BUILD_NAME
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_BUILD_APP_ID
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - METAMASK_BUILD_ICON
-  # Modified in <root>/development/build/scripts.js:@setEnvironmentVariables
+  # 在 <root>/development/build/scripts.js:@setEnvironmentVariables 中修改
   - NODE_ENV
-  # Defined by node itself
-  # For the purposes of the build system we define it as empty below
-  # if it's not inside process.env
-  # Also see DEBUG and METAMASK_DEBUG
+  # 由 node 本身定义
+  # 为了构建系统的目的，如果它不在 process.env 中，我们将其定义为空
+  # 另见 DEBUG 和 METAMASK_DEBUG
   - NODE_DEBUG: ''
-  # Used by react-devtools-core
+  # 由 react-devtools-core 使用
   - EDITOR_URL: ''
-  # Determines if Multichain API features should be used
-  # NOTE: The manifest.json for the build that sets this feature flag
-  # must also include an "externally_connectable" entry as follows:
+  # 确定是否应使用多链 API 功能
+  # 注意：设置此功能标志的构建的 manifest.json
+  # 还必须包含一个 "externally_connectable" 条目，如下所示：
   # "externally_connectable": {
   #   "matches": ["http://*/*", "https://*/*"],
   #   "ids": ["*"]
   # }
   - MULTICHAIN_API: false
-  # Determines if feature flagged Chain permissions
+  # 确定是否启用链权限功能标志
   - CHAIN_PERMISSIONS: ''
-  # Determines if Portfolio View UI should be shown
+  # 确定是否应显示投资组合视图 UI
   - PORTFOLIO_VIEW: 'true'
-  # Enables use of test gas fee flow to debug gas fee estimation
+  # 启用测试燃气费流程以调试燃气费估算
   - TEST_GAS_FEE_FLOWS: false
-  # Temporary mechanism to enable security alerts API prior to release
+  # 在发布前启用安全警报 API 的临时机制
   - SECURITY_ALERTS_API_ENABLED: 'true'
-  # URL of security alerts API used to validate dApp requests
+  # 用于验证 dApp 请求的安全警报 API 的 URL
   - SECURITY_ALERTS_API_URL: 'https://security-alerts.api.cx.metamask.io'
-  # API key to authenticate Etherscan requests to avoid rate limiting
+  # 用于验证 Etherscan 请求以避免速率限制的 API 密钥
   - ETHERSCAN_API_KEY: ''
 
-  # Enables the notifications feature within the build:
+  # 在构建中启用通知功能：
   - NOTIFICATIONS: ''
 
-  # This will be defined if running a unit test
+  # 如果运行单元测试，将定义此项
   - JEST_WORKER_ID: undefined
 
   - METAMASK_RAMP_API_CONTENT_BASE_URL: https://on-ramp-content.api.cx.metamask.io
 
   ###
-  # Meta variables
+  # 元变量
   ###
 
-  # Uses yaml anchors to DRY - https://juju.is/docs/sdk/yaml-anchors-and-aliases
+  # 使用 yaml 锚点来实现 DRY（不重复自己）- https://juju.is/docs/sdk/yaml-anchors-and-aliases
   - METAMASK_BUILD_TYPE_DEFAULT: *default
-  # Path to a JSON file that will be used to override the default manifest values.
+  # 将用于覆盖默认清单值的 JSON 文件的路径
   - MANIFEST_OVERRIDES: null
 
   ###
-  # Account Abstraction (EIP-4337)
+  # 账户抽象化 (EIP-4337)
   ###
   - EIP_4337_ENTRYPOINT: null
 
   ###
-  # Enable/disable why did you render debug tool: https://github.com/welldone-software/why-did-you-render
-  # This should NEVER be enabled in production since it slows down react
+  # 启用/禁用 why did you render 调试工具：https://github.com/welldone-software/why-did-you-render
+  # 这在生产环境中永远不应该启用，因为它会减慢 React 的速度
   ###
   - ENABLE_WHY_DID_YOU_RENDER: false
 
   ###
-  # Unused environment variables referenced in dependencies
-  # Unset environment variables cause a build error. These are set to `null` to tell our build
-  # system that they are intentionally unset.
+  # 依赖项中引用但未使用的环境变量
+  # 未设置的环境变量会导致构建错误。这些设置为 `null` 是为了告诉我们的构建
+  # 系统它们是有意未设置的。
   ###
-  - ETHERSCAN_KEY: null # Used by `gridplus-sdk/dist/util.js`
+  - ETHERSCAN_KEY: null # 由 `gridplus-sdk/dist/util.js` 使用
 
   ###
-  # Public key used to verify EIP-7702 contract address signatures set in LaunchDarkly.
+  # 用于验证在 LaunchDarkly 中设置的 EIP-7702 合约地址签名的公钥
   ###
   - EIP_7702_PUBLIC_KEY: '0x3c7a1cCCe462e96D186B8ca9a1BCB2010C3dABa3'
 
-  # URL of transaction relay API
+  # 交易中继 API 的 URL
   - TRANSACTION_RELAY_API_URL: null
 
-  # Address of DelegationManager smart contract
+  # DelegationManager 智能合约的地址
   - DELEGATION_MANAGER_ADDRESS: null
 
-  # Address of enforcer used for gasless EIP-7702 transactions
+  # 用于无燃气 EIP-7702 交易的执行器地址
   - GASLESS_7702_ENFORCER_ADDRESS: null
